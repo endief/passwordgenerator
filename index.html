@@ -6,7 +6,7 @@
     <title>Brankas Sandi Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght300;400;500;600&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -19,10 +19,6 @@
                     },
                     fontFamily: {
                         sans: ['Poppins', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'premium-float': '0 12px 30px -5px rgba(255, 255, 255, 0.08)',
-                        'premium-hover': '0 20px 40px -5px rgba(255, 255, 255, 0.12)',
                     }
                 }
             }
@@ -34,247 +30,461 @@
             background-color: #020202; /* Onyx */
             min-height: 100vh;
         }
-        
-        /* Custom Scrollbar for premium feel */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #B2D5E5; }
+        input[type="range"] { accent-color: #B2D5E5; }
 
-        /* Sembunyikan panah pada input number di beberapa browser */
-        input[type="range"] {
-            accent-color: #B2D5E5;
+        /* ======================================================= */
+        /* ========== PREMIUM CUSTOM ALERT & ANIMATION =========== */
+        /* ======================================================= */
+        .premium-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15,23,42,0.6); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
+        .premium-overlay.show { opacity: 1; visibility: visible; }
+
+        .premium-card {
+            background: white; border-radius: 32px; padding: 40px 30px;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.3); text-align: center;
+            width: 90%; max-width: 320px; 
+            transform: scale(0.9) translateY(15px); 
+            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .premium-overlay.show .premium-card { transform: scale(1) translateY(0); }
+
+        .p-icon-container {
+            position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .p-circle {
+            position: absolute; width: 64px; height: 64px; border-radius: 50%;
+            background: #0F2D5C; top: 50%; left: 50%; margin: -32px 0 0 -32px;
+            transform: scale(0); opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s ease;
+            z-index: 1;
+        }
+        .is-finished .p-circle { transform: scale(1); opacity: 1; }
+
+        .is-success .p-circle { background: #10b981; } 
+        .is-error .p-circle { background: #ef4444; }   
+        
+        .p-svg {
+            position: absolute; width: 32px; height: 32px; top: 50%; left: 50%; margin: -16px 0 0 -16px;
+            fill: none; stroke: white; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 100; stroke-dashoffset: 100; z-index: 2;
+        }
+        .is-finished .p-svg { animation: p-draw 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.2s; }
+        @keyframes p-draw { to { stroke-dashoffset: 0; } }
+
+        .p-ripple {
+            position: absolute; width: 64px; height: 64px; border-radius: 50%;
+            border: 2px solid transparent; top: 50%; left: 50%; margin: -32px 0 0 -32px;
+            transform: scale(1); opacity: 0; z-index: 0;
+        }
+        .is-success .p-ripple { border-color: #10b981; animation: p-rip 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
+        .is-error .p-ripple { border-color: #ef4444; animation: p-rip 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
+        @keyframes p-rip { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
+
+        .is-finished .p-icon-container { animation: p-bounce-soft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s; }
+        @keyframes p-bounce-soft { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body class="text-gray-300 flex items-center justify-center p-4">
 
-    <div class="bg-carbon rounded-[32px] shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[95vh] overflow-y-auto border border-gray-800/50">
+    <div id="loginScreen" class="bg-carbon rounded-[32px] p-6 md:p-8 w-full max-w-md border border-gray-800/50 transition-all duration-500">
+        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">Buka Brankas</h1>
+        <p class="text-center text-[10px] text-gray-500 mb-8 uppercase tracking-widest">Masukkan Master Password Anda</p>
         
-        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">
-            Brankas Pribadi
-        </h1>
-        <p class="text-center text-[10px] text-gray-500 mb-8 uppercase tracking-widest">AES-256 Offline Encrypted</p>
-
         <div class="mb-6 bg-onyx rounded-3xl p-4 border border-gray-800/50">
-            <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Master Password</label>
-            <div class="flex gap-3">
-                <input type="password" id="masterPassword" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue transition-colors" placeholder="Kunci Enkripsi Anda...">
-                
-                <button onclick="uiCekBiometrik()" class="bg-carbon border border-gray-800 hover:border-candyblue hover:text-candyblue text-gray-400 p-3 rounded-full transition-all duration-300 flex items-center justify-center aspect-square" title="Gunakan Biometrik">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                    </svg>
-                </button>
-            </div>
+            <input type="password" id="loginMasterInput" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3.5 text-white text-sm text-center focus:outline-none focus:border-candyblue transition-colors" placeholder="Kunci Rahasia Utama...">
         </div>
 
-        <div class="flex gap-3 mb-6 bg-onyx p-1.5 rounded-full border border-gray-800/50">
-            <button onclick="setMode('sandi')" id="btnSandi" class="w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float">Mode Sandi</button>
-            <button onclick="setMode('pin')" id="btnPin" class="w-1/2 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all">Mode PIN</button>
-        </div>
-
-        <div class="mb-6">
-            <div class="mb-4 flex justify-between items-center pl-2">
-                <label class="text-xs text-gray-400">Panjang Karakter:</label>
-                <span id="lenDisplay" class="font-semibold text-candyblue text-sm">16</span>
-            </div>
-            <input type="range" id="pwLength" min="4" max="64" value="16" class="w-full mb-5" oninput="document.getElementById('lenDisplay').innerText = this.value">
-
-            <div id="opsiSandi" class="grid grid-cols-2 gap-3 text-xs text-gray-300">
-                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkUpper" checked> A-Z (Kapital)</label>
-                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkLower" checked> a-z (Kecil)</label>
-                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkNum" checked> 0-9 (Angka)</label>
-                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkSym" checked> !@#$% (Simbol)</label>
-            </div>
-        </div>
-
-        <div class="mb-8 relative">
-            <input type="text" id="hasilGenerate" class="w-full bg-onyx border border-gray-800 rounded-3xl p-5 pb-16 text-white text-center font-mono tracking-widest text-lg focus:outline-none" readonly placeholder="••••••••">
-            
-            <div class="absolute bottom-2 left-2 right-2">
-                <button onclick="uiGenerate()" class="w-full bg-carbon text-white text-xs uppercase tracking-wider font-semibold py-3 rounded-full hover:bg-gray-800 transition duration-300 border border-gray-700">
-                    Acak Sandi Baru
-                </button>
-            </div>
-        </div>
-
-        <div class="mb-6">
-            <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Simpan Akun Baru</label>
-            <input type="text" id="namaAkun" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-4 transition-colors" placeholder="Nama Akun (Misal: Gmail, BCA)">
-            
-            <button onclick="uiSimpan()" class="w-full bg-candyblue text-onyx font-semibold py-3.5 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transform hover:-translate-y-1 transition-all duration-300">
-                Simpan ke Brankas
-            </button>
-        </div>
-
-        <hr class="border-gray-800 my-8">
-
-        <div>
-            <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Buka Brankas</label>
-            <input type="text" id="cariAkun" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-4 transition-colors" placeholder="Masukkan Nama Akun...">
-            
-            <button onclick="uiAmbil()" class="w-full bg-carbon border border-gray-700 text-white hover:border-candyblue hover:text-candyblue font-medium py-3.5 px-4 rounded-full transition-all duration-300">
-                Tampilkan Sandi
-            </button>
-
-            <div id="hasilPencarian" class="hidden w-full bg-onyx border border-candyblue/50 rounded-2xl p-4 text-center text-candyblue font-mono tracking-widest break-all mt-4 text-lg">
-            </div>
-        </div>
-
+        <button onclick="prosesLogin()" class="w-full bg-candyblue text-onyx font-semibold py-3.5 px-4 rounded-full shadow-[0_15px_35px_rgba(200,200,200,0.08)] hover:shadow-[0_20px_40px_rgba(200,200,200,0.15)] transform hover:-translate-y-0.5 transition-all duration-300">
+            Akses Brankas
+        </button>
     </div>
 
+    <div id="vaultScreen" class="hidden bg-carbon rounded-[32px] p-6 md:p-8 w-full max-w-md max-h-[95vh] overflow-y-auto border border-gray-800/50 transition-all duration-500">
+        <div class="flex justify-between items-center mb-1">
+            <h1 class="text-xl font-semibold text-white tracking-wide">Isi Brankas Anda</h1>
+            <button onclick="prosesLogout()" class="text-xs text-red-400 hover:text-red-300 border border-red-900/40 px-3 py-1.5 rounded-full bg-onyx">Kunci</button>
+        </div>
+        <p class="text-[10px] text-teal-400 mb-6 uppercase tracking-widest font-mono">Vault Mode Aktif</p>
+
+        <div class="mb-6 p-4 bg-onyx rounded-2xl border border-gray-800/50">
+            <label class="block text-[11px] font-medium mb-2 text-gray-400 uppercase tracking-wider pl-1">Tambah Sandi Baru</label>
+            <input type="text" id="newAccount" class="w-full bg-carbon border border-gray-800 rounded-full px-4 py-2 text-white text-xs mb-2 focus:outline-none focus:border-candyblue" placeholder="Nama Akun (Misal: Gmail, ATM BCA)">
+            
+            <div class="relative mb-3">
+                <input type="text" id="newPassword" class="w-full bg-carbon border border-gray-800 rounded-full px-4 py-2 text-white text-xs font-mono tracking-wider focus:outline-none focus:border-candyblue" placeholder="Password / PIN">
+                <button onclick="generateRandomVal()" class="absolute right-2 top-1 bg-gray-800 text-gray-300 text-[10px] px-3 py-1 rounded-full border border-gray-700 hover:text-white transition">Acak</button>
+            </div>
+
+            <div class="mb-3">
+                <div class="flex justify-between text-[10px] text-gray-500 mb-1 px-1">
+                    <span>Panjang Acak:</span>
+                    <span id="lenLabel" class="text-candyblue">16</span>
+                </div>
+                <input type="range" id="pwLength" min="6" max="32" value="16" class="w-full h-1" oninput="document.getElementById('lenLabel').innerText = this.value">
+            </div>
+
+            <button onclick="simpanSandiBaru()" class="w-full bg-candyblue text-onyx text-xs font-semibold py-2 rounded-full shadow-md hover:opacity-90 transition">
+                Simpan Item
+            </button>
+        </div>
+
+        <hr class="border-gray-800 my-4">
+
+        <div id="passwordContainer" class="space-y-3">
+            </div>
+    </div>
+
+
+    <div id="authModal" class="fixed inset-0 bg-onyx/70 backdrop-blur-md flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-carbon border border-gray-800 rounded-[28px] p-6 w-[90%] max-w-sm text-center shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-onyx border border-gray-800 flex items-center justify-center mx-auto mb-3 text-candyblue">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+                </svg>
+            </div>
+            <h3 class="text-base font-semibold text-white mb-1">Verifikasi Keamanan</h3>
+            <p id="authModalDesc" class="text-xs text-gray-400 mb-4">Konfirmasi tindakan dengan Master Password Anda.</p>
+            
+            <input type="password" id="authModalInput" class="w-full bg-onyx border border-gray-800 rounded-full px-4 py-2.5 text-white text-xs text-center focus:outline-none focus:border-candyblue mb-4 transition-colors" placeholder="Masukkan Master Password...">
+            
+            <div class="flex gap-3">
+                <button onclick="closeAuthModal()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-medium py-2.5 rounded-full transition-all">Batal</button>
+                <button onclick="confirmAuthModal()" class="w-1/2 bg-candyblue text-onyx text-xs font-semibold py-2.5 rounded-full transition-all shadow-md">Verifikasi</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="premiumAlertOverlay" class="premium-overlay">
+        <div class="premium-card">
+            <div id="pIconContainer" class="p-icon-container">
+                <div class="p-circle"></div>
+                <div class="p-ripple"></div>
+                <svg id="pSvgSuccess" class="p-svg" viewBox="0 0 24 24">
+                    <path d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <svg id="pSvgError" class="p-svg" viewBox="0 0 24 24">
+                    <path d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+            <h3 id="premiumAlertTitle" class="text-lg font-semibold text-gray-900 mb-1">Status</h3>
+            <p id="premiumAlertMsg" class="text-xs text-gray-500 mb-5">Detail pesan pemberitahuan</p>
+            <button onclick="closePremiumAlert()" class="bg-gray-900 text-white text-[11px] uppercase tracking-wider font-semibold py-2 px-6 rounded-full hover:bg-gray-800 transition">Selesai</button>
+        </div>
+    </div>
+
+
     <script>
-        let modeAktif = 'sandi'; 
+        // State Global Aplikasi
+        let currentMasterPassword = "";
+        let vaultItems = []; 
+        let revealedItems = {}; // Menyimpan item id yang eye-aktif nya terbuka
+        
+        let activeDropdownId = null;
+        let pendingAction = null; // 'view', 'copy', 'delete'
+        let pendingTargetId = null;
 
-        // --- MANAJEMEN UI ---
-        function setMode(mode) {
-            modeAktif = mode;
-            const btnSandi = document.getElementById('btnSandi');
-            const btnPin = document.getElementById('btnPin');
-            const opsiSandi = document.getElementById('opsiSandi');
-            const pwLength = document.getElementById('pwLength');
-            const lenDisplay = document.getElementById('lenDisplay');
+        // Kriptografi & Manajemen Brankas Multi-Master Password
+        function dapatkanStorageKey(masterPass) {
+            // Membuat key unik terisolasi untuk tiap master password menggunakan SHA256
+            return "vlt_" + CryptoJS.SHA256(masterPass).toString();
+        }
 
-            // Style class for Active/Inactive Tab
-            const activeClass = "w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float";
-            const inactiveClass = "w-1/2 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all";
+        function prosesLogin() {
+            const mpInput = document.getElementById('loginMasterInput').value;
+            if (!mpInput) return alert("Sandi utama kosong!");
 
-            if(mode === 'sandi') {
-                btnSandi.className = activeClass;
-                btnPin.className = inactiveClass;
-                opsiSandi.classList.remove('hidden');
-                pwLength.min = 8;
-                pwLength.max = 64;
-                pwLength.value = 16;
-                lenDisplay.innerText = "16";
+            const storageKey = dapatkanStorageKey(mpInput);
+            const cipherText = localStorage.getItem(storageKey);
+
+            if (cipherText) {
+                try {
+                    // Coba dekripsi isi brankas terkait key tersebut
+                    const bytes = CryptoJS.AES.decrypt(cipherText, mpInput);
+                    const rawDataStr = bytes.toString(CryptoJS.enc.Utf8);
+                    
+                    if(!rawDataStr) throw new Error("Sandi salah");
+                    
+                    vaultItems = JSON.parse(rawDataStr);
+                } catch (e) {
+                    triggerPremiumNotification('error', 'Akses Ditolak', 'Master Password Anda tidak cocok.');
+                    return;
+                }
             } else {
-                btnSandi.className = inactiveClass;
-                btnPin.className = activeClass;
-                opsiSandi.classList.add('hidden');
-                pwLength.min = 4;
-                pwLength.max = 8;
-                pwLength.value = 6;
-                lenDisplay.innerText = "6";
+                // Jika belum ada data di master password tersebut, inisialisasi kumpulan data baru
+                vaultItems = [];
             }
-        }
 
-        // --- ALGORITMA GENERATOR CSPRNG ---
-        function generatePasswordCSP(length, upper, lower, num, sym) {
-            let charset = "";
-            if(upper) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            if(lower) charset += "abcdefghijklmnopqrstuvwxyz";
-            if(num) charset += "0123456789";
-            if(sym) charset += "!@#$%^&*?";
-
-            if(charset === "") return "Pilih minimal 1 opsi!";
-
-            let password = "";
-            const randomValues = new Uint32Array(length);
-            window.crypto.getRandomValues(randomValues);
-            for (let i = 0; i < length; i++) password += charset[randomValues[i] % charset.length];
-            return password;
-        }
-
-        function generatePINCSP(length) {
-            const polaVisualGaris = ["2580", "0852", "1470", "0741", "369", "963"];
-            const polaSudut = ["1397", "7931", "1739", "9371"];
-            const polaBerurutan = ["1234", "2345", "3456", "4567", "5678", "6789", "0123", "9876", "8765", "7654", "6543", "5432", "4321", "3210"];
+            // Sukses Masuk Sesi
+            currentMasterPassword = mpInput;
+            revealedItems = {}; // Reset visibilitas sandi
             
-            while(true) {
-                let pin = "";
-                const randomValues = new Uint32Array(length);
-                window.crypto.getRandomValues(randomValues);
-                for (let i = 0; i < length; i++) pin += (randomValues[i] % 10).toString();
-                if (/^(\d)\1+$/.test(pin)) continue;
-                if (/^(\d\d)\1+$/.test(pin) || /^(\d)\1(\d)\2$/.test(pin)) continue;
-                if ([...polaVisualGaris, ...polaSudut, ...polaBerurutan].some(pola => pin.includes(pola))) continue;
-                return pin; 
-            }
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('vaultScreen').classList.remove('hidden');
+            document.getElementById('loginMasterInput').value = "";
+            
+            renderVaultItems();
         }
 
-        // --- PENGHUBUNG UI ---
-        function uiGenerate() {
+        function prosesLogout() {
+            currentMasterPassword = "";
+            vaultItems = [];
+            revealedItems = {};
+            document.getElementById('vaultScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function simpanVaultKeStorage() {
+            const storageKey = dapatkanStorageKey(currentMasterPassword);
+            const cipherText = CryptoJS.AES.encrypt(JSON.stringify(vaultItems), currentMasterPassword).toString();
+            localStorage.setItem(storageKey, cipherText);
+        }
+
+        // Penanganan Tambah Item Baru
+        function generateRandomVal() {
             const len = parseInt(document.getElementById('pwLength').value);
-            let hasil = "";
-            if (modeAktif === 'sandi') {
-                const up = document.getElementById('chkUpper').checked;
-                const low = document.getElementById('chkLower').checked;
-                const num = document.getElementById('chkNum').checked;
-                const sym = document.getElementById('chkSym').checked;
-                hasil = generatePasswordCSP(len, up, low, num, sym);
-            } else {
-                hasil = generatePINCSP(len);
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+            let result = "";
+            const randomArr = new Uint32Array(len);
+            window.crypto.getRandomValues(randomArr);
+            for(let i=0; i<len; i++) {
+                result += chars[randomArr[i] % chars.length];
             }
-            document.getElementById('hasilGenerate').value = hasil;
+            document.getElementById('newPassword').value = result;
         }
 
-        function uiSimpan() {
-            const master = document.getElementById('masterPassword').value;
-            const data = document.getElementById('hasilGenerate').value;
-            const akun = document.getElementById('namaAkun').value.trim().toLowerCase();
+        function simpanSandiBaru() {
+            const acc = document.getElementById('newAccount').value.trim();
+            const pass = document.getElementById('newPassword').value;
 
-            if (!master) return alert("Master Password wajib diisi!");
-            if (!data) return alert("Buat sandi/PIN terlebih dahulu!");
-            if (!akun) return alert("Masukkan nama akun!");
+            if(!acc || !acc) return alert("Akun dan Password wajib terisi!");
 
-            const teksTerenkripsi = CryptoJS.AES.encrypt(data, master).toString();
-            localStorage.setItem("br_" + akun, teksTerenkripsi);
+            const newItem = {
+                id: "id_" + Date.now() + "_" + Math.random().toString(36).substr(2,4),
+                account: acc,
+                ciphertext: CryptoJS.AES.encrypt(pass, currentMasterPassword).toString()
+            };
+
+            vaultItems.push(newItem);
+            simpanVaultKeStorage();
+            renderVaultItems();
+
+            document.getElementById('newAccount').value = "";
+            document.getElementById('newPassword').value = "";
+        }
+
+        // Render Kartu & Komponen Dom Secara Dinamis Sesuai Aturan
+        function renderVaultItems() {
+            const container = document.getElementById('passwordContainer');
+            container.innerHTML = "";
+
+            if(vaultItems.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-600 py-6">Belum ada item sandi disimpan.</p>`;
+                return;
+            }
+
+            vaultItems.forEach(item => {
+                const isRevealed = !!revealedItems[item.id];
+                let plainPasswordText = "••••••••";
+
+                if (isRevealed) {
+                    try {
+                        const bytes = CryptoJS.AES.decrypt(item.ciphertext, currentMasterPassword);
+                        plainPasswordText = bytes.toString(CryptoJS.enc.Utf8);
+                    } catch(e) { plainPasswordText = "Error Dekripsi"; }
+                }
+
+                const cardHtml = `
+                    <div class="bg-carbon border border-gray-800/80 rounded-2xl p-4 relative flex items-center justify-between transition-all duration-300 hover:border-gray-700/60">
+                        <div class="flex-1 min-w-0 pr-10">
+                            <h4 class="text-xs font-semibold text-white tracking-wide truncate mb-1">${item.account}</h4>
+                            <p class="font-mono text-xs tracking-wider truncate transition-all duration-300 ${isRevealed ? 'text-candyblue' : 'text-gray-600'}">
+                                ${plainPasswordText}
+                            </p>
+                        </div>
+
+                        <div class="flex items-center pr-3">
+                            <button onclick="requestAksiSensitif('view', '${item.id}')" class="text-gray-500 hover:text-white transition-colors p-1" title="Tampilkan/Sembunyikan">
+                                ${isRevealed ? 
+                                    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>` : 
+                                    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>`
+                                }
+                            </button>
+                        </div>
+
+                        <div class="absolute top-2 right-2">
+                            <button onclick="bukaDropdownMenu(event, '${item.id}')" class="text-gray-600 hover:text-white font-bold p-1 rounded transition-all focus:outline-none text-xs">⋮</button>
+                            
+                            <div id="drop-${item.id}" class="hidden absolute right-0 mt-1 w-10 bg-onyx border border-gray-800 rounded-xl shadow-2xl py-1 z-30 transition-all">
+                                <button onclick="requestAksiSensitif('copy', '${item.id}')" class="w-full h-8 flex items-center justify-center text-gray-500 hover:text-candyblue transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.524 2.25h-3.048a2.25 2.25 0 0 0-2.141 1.638l-.154.515a1.859 1.859 0 0 1-2.43 1.177l-.538-.203a2.25 2.25 0 0 0-2.905 1.258l-1.524 3.68a2.25 2.25 0 0 0 1.21 2.923l.537.203a1.859 1.859 0 0 1 1.177 2.43l-.154.515a2.25 2.25 0 0 0 1.638 2.141m12.446-13.3a2.25 2.25 0 0 1 2.141 1.638l.154.515a1.859 1.859 0 0 0 2.43 1.177l.538-.203a2.25 2.25 0 0 1 2.905 1.258l1.524 3.68a2.25 2.25 0 0 1-1.21 2.923l-.537.203a1.859 1.859 0 0 0-1.177 2.43l.154.515a2.25 2.25 0 0 1-1.638 2.141m-2.25-10.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
+                                </button>
+                                <button onclick="requestAksiSensitif('delete', '${item.id}')" class="w-full h-8 flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-red-500"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.34 9m-4.72 0-.34-9m9.96-3.204a18.103 18.103 0 0 0-2.36-.214M15.75 22.5a2.25 2.25 0 0 1-2.25-2.25V6m3 0V4.5a2.25 2.25 0 0 0-2.25-2.25h-1.5a2.25 2.25 0 0 0-2.25 2.25V6m3 0H9m-1.285 2.052.485 12c.06 1.488 1.277 2.66 2.768 2.66h4.815c1.491 0 2.707-1.172 2.768-2.66l.485-12m-12 0a17.961 17.961 0 0 1 12 0" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // Manajemen Interaksi Dropdown Menu Titik Tiga
+        function bukaDropdownMenu(e, id) {
+            e.stopPropagation();
+            tutupSemuaDropdown();
             
-            alert(`Sandi untuk ${akun} berhasil diamankan!`);
-            document.getElementById('namaAkun').value = '';
-            document.getElementById('hasilGenerate').value = '';
-        }
-
-        function uiAmbil() {
-            const master = document.getElementById('masterPassword').value;
-            const akun = document.getElementById('cariAkun').value.trim().toLowerCase();
-            const box = document.getElementById('hasilPencarian');
-
-            if (!master || !akun) return alert("Isi Master Password dan Nama Akun!");
-
-            const encrypted = localStorage.getItem("br_" + akun);
-            if (!encrypted) {
-                tampilPesan(box, "Akun tidak ditemukan!", false);
-                return;
-            }
-
-            try {
-                const bytes = CryptoJS.AES.decrypt(encrypted, master);
-                const asli = bytes.toString(CryptoJS.enc.Utf8);
-                if(!asli) throw new Error();
-                tampilPesan(box, asli, true);
-            } catch (e) {
-                tampilPesan(box, "Akses Ditolak: Master Password Salah!", false);
-            }
-        }
-
-        function tampilPesan(elemen, teks, sukses) {
-            elemen.classList.remove('hidden');
-            if (sukses) {
-                elemen.className = "w-full bg-onyx border border-candyblue/50 rounded-2xl p-4 text-center text-candyblue font-mono tracking-widest break-all mt-4 text-lg";
+            if (activeDropdownId === id) {
+                activeDropdownId = null;
             } else {
-                elemen.className = "w-full bg-red-950/30 border border-red-900 rounded-2xl p-4 text-center text-red-500 text-sm mt-4";
+                document.getElementById('drop-' + id).classList.remove('hidden');
+                activeDropdownId = id;
             }
-            elemen.innerText = teks;
         }
 
-        async function uiCekBiometrik() {
-            if (!window.PublicKeyCredential) {
-                alert("Perangkat tidak mendukung biometrik browser.");
+        function tutupSemuaDropdown() {
+            document.querySelectorAll('[id^="drop-"]').forEach(el => el.classList.add('hidden'));
+            activeDropdownId = null;
+        }
+
+        // Alur Verifikasi Aksi Sensitif Bermaster Password
+        function requestAksiSensitif(aksi, id) {
+            tutupSemuaDropdown();
+            
+            // Aturan Khusus: Jika aksi 'view' dan status sudah terbuka, langsung tutup tanpa verifikasi ulang
+            if(aksi === 'view' && revealedItems[id]) {
+                delete revealedItems[id];
+                renderVaultItems();
                 return;
             }
-            try {
-                const challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                const assertion = await navigator.credentials.get({
-                    publicKey: { challenge: challenge, timeout: 60000, userVerification: "required" }
-                });
-                if (assertion) alert("Autentikasi Biometrik berhasil dilewati.");
-            } catch (error) {
-                console.log(error);
+
+            // Aturan Khusus: Jika aksi 'copy' dan status item sudah dalam kondisi terbuka (eye-aktif), copy langsung
+            if(aksi === 'copy' && revealedItems[id]) {
+                eksekusiAksiLangsung('copy', id);
+                return;
+            }
+
+            // Aksi sensitif memerlukan pemanggilan modal verifikasi
+            pendingAction = aksi;
+            pendingTargetId = id;
+
+            let descText = "Konfirmasi tindakan keamanan brankas Anda.";
+            if (aksi === 'view') descText = "Masukkan Master Password untuk menampilkan kata sandi.";
+            if (aksi === 'copy') descText = "Masukkan Master Password untuk menyalin kata sandi.";
+            if (aksi === 'delete') descText = "Menghapus sandi bersifat permanen. Masukkan Master Password.";
+
+            document.getElementById('authModalDesc').innerText = descText;
+            
+            // Tampilkan Modal
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('authModalInput').focus();
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('authModalInput').value = "";
+            pendingAction = null;
+            pendingTargetId = null;
+        }
+
+        function confirmAuthModal() {
+            const userInput = document.getElementById('authModalInput').value;
+            
+            if(userInput === currentMasterPassword) {
+                // Autentikasi Benar
+                const act = pendingAction;
+                const target = pendingTargetId;
+                closeAuthModal();
+
+                setTimeout(() => {
+                    eksekusiAksiLangsung(act, target);
+                }, 200);
+            } else {
+                // Autentikasi Gagal
+                closeAuthModal();
+                setTimeout(() => {
+                    triggerPremiumNotification('error', 'Verifikasi Gagal', 'Master Password salah.');
+                }, 200);
             }
         }
+
+        function eksekusiAksiLangsung(aksi, id) {
+            const targetItem = vaultItems.find(item => item.id === id);
+            if(!targetItem) return;
+
+            let plainTextPassword = "";
+            try {
+                const bytes = CryptoJS.AES.decrypt(targetItem.ciphertext, currentMasterPassword);
+                plainTextPassword = bytes.toString(CryptoJS.enc.Utf8);
+            } catch(e) { return alert("Gagal mendekripsi internal data."); }
+
+            if(aksi === 'view') {
+                revealedItems[id] = true;
+                renderVaultItems();
+                triggerPremiumNotification('success', 'Berhasil Diverifikasi', 'Sandi ditampilkan.');
+            } 
+            else if(aksi === 'copy') {
+                navigator.clipboard.writeText(plainTextPassword).then(() => {
+                    triggerPremiumNotification('success', 'Berhasil Disalin', 'Password disalin ke clipboard.');
+                });
+            } 
+            else if(aksi === 'delete') {
+                vaultItems = vaultItems.filter(item => item.id !== id);
+                if(revealedItems[id]) delete revealedItems[id];
+                simpanVaultKeStorage();
+                renderVaultItems();
+                triggerPremiumNotification('success', 'Berhasil Dihapus', 'Item dihapus secara aman.');
+            }
+        }
+
+        // Pemicu Animasi Sukses & Gagal Kustom dari Aturan Pengguna
+        function triggerPremiumNotification(status, title, message) {
+            const overlay = document.getElementById('premiumAlertOverlay');
+            const container = document.getElementById('pIconContainer');
+            const svgSuccess = document.getElementById('pSvgSuccess');
+            const svgError = document.getElementById('pSvgError');
+
+            // Reset state kelas animasi
+            container.className = "p-icon-container";
+            svgSuccess.classList.add('hidden');
+            svgError.classList.add('hidden');
+
+            // Set tipe status & jalankan visualisasi
+            if(status === 'success') {
+                container.classList.add('is-success', 'is-finished');
+                svgSuccess.classList.remove('hidden');
+            } else {
+                container.classList.add('is-error', 'is-finished');
+                svgError.classList.remove('hidden');
+            }
+
+            document.getElementById('premiumAlertTitle').innerText = title;
+            document.getElementById('premiumAlertMsg').innerText = message;
+            
+            overlay.classList.add('show');
+        }
+
+        function closePremiumAlert() {
+            document.getElementById('premiumAlertOverlay').classList.remove('show');
+        }
+
+        // Global Event listener untuk menutup jendela popup menu jika menekan area luar luar
+        window.addEventListener('click', function() {
+            tutupSemuaDropdown();
+        });
     </script>
 </body>
 </html>
