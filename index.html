@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brankas Sandi Pribadi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Background gradien modern yang bergerak */
+            background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Efek Glassmorphism (Kaca) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animasi muncul (Fade In) saat web dibuka */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-white flex items-center justify-center p-4">
+
+    <div class="glass-panel rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md fade-in">
+        
+        <h1 class="text-3xl font-semibold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
+            Brankas Sandi
+        </h1>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2 text-gray-300">Master Password (Wajib)</label>
+            <input type="password" id="masterPassword" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition" placeholder="Masukkan kunci rahasia Anda...">
+        </div>
+
+        <hr class="border-gray-600 my-6">
+
+        <div class="mb-6">
+            <h2 class="text-xl font-medium mb-4 text-teal-300">1. Buat Sandi Baru</h2>
+            <div class="flex items-center gap-4 mb-4">
+                <button onclick="uiGeneratePassword()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200">
+                    Acak Sandi Kuat
+                </button>
+            </div>
+            <input type="text" id="hasilGenerate" class="w-full bg-gray-900/80 border border-gray-600 rounded-lg p-3 text-white text-center tracking-widest font-mono" readonly placeholder="Sandi akan muncul di sini">
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2 text-gray-300">Nama Akun (contoh: Instagram, Gmail)</label>
+            <input type="text" id="namaAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 mb-3" placeholder="Nama Akun...">
+            
+            <button onclick="uiSimpanPassword()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200">
+                Simpan ke Brankas Lokal
+            </button>
+        </div>
+
+        <hr class="border-gray-600 my-6">
+
+        <div>
+            <h2 class="text-xl font-medium mb-4 text-blue-300">2. Lihat Sandi Tersimpan</h2>
+            <input type="text" id="cariAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 mb-3" placeholder="Masukkan Nama Akun...">
+            
+            <button onclick="uiAmbilPassword()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200 mb-4">
+                Buka Brankas
+            </button>
+
+            <div id="hasilPencarian" class="hidden w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all">
+                </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- LOGIKA INTI ---
+        function generateSecurePassword(length = 16) {
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+            let password = "";
+            const randomValues = new Uint32Array(length);
+            window.crypto.getRandomValues(randomValues);
+            for (let i = 0; i < length; i++) {
+                password += charset[randomValues[i] % charset.length];
+            }
+            return password;
+        }
+
+        // --- PENGHUBUNG ANTARMUKA (UI) ---
+        function uiGeneratePassword() {
+            const sandiBaru = generateSecurePassword();
+            document.getElementById('hasilGenerate').value = sandiBaru;
+        }
+
+        function uiSimpanPassword() {
+            const master = document.getElementById('masterPassword').value;
+            const sandi = document.getElementById('hasilGenerate').value;
+            const akun = document.getElementById('namaAkun').value.trim().toLowerCase();
+
+            if (!master) return alert("Master Password wajib diisi untuk mengenkripsi data!");
+            if (!sandi) return alert("Buat sandi terlebih dahulu!");
+            if (!akun) return alert("Masukkan nama akun!");
+
+            // Enkripsi dan simpan
+            const teksTerenkripsi = CryptoJS.AES.encrypt(sandi, master).toString();
+            localStorage.setItem("brankas_" + akun, teksTerenkripsi);
+            
+            alert(`Sandi untuk ${akun} berhasil dikunci dan disimpan di perangkat ini!`);
+            document.getElementById('namaAkun').value = '';
+            document.getElementById('hasilGenerate').value = '';
+        }
+
+        function uiAmbilPassword() {
+            const master = document.getElementById('masterPassword').value;
+            const akun = document.getElementById('cariAkun').value.trim().toLowerCase();
+            const boxHasil = document.getElementById('hasilPencarian');
+
+            if (!master) return alert("Masukkan Master Password Anda!");
+            if (!akun) return alert("Masukkan nama akun yang ingin dicari!");
+
+            const dataTerenkripsi = localStorage.getItem("brankas_" + akun);
+            
+            if (!dataTerenkripsi) {
+                boxHasil.classList.remove('hidden');
+                boxHasil.className = "w-full bg-red-900/50 border border-red-500 rounded-lg p-3 text-center text-red-300 mt-4";
+                boxHasil.innerText = "Akun tidak ditemukan!";
+                return;
+            }
+
+            try {
+                const bytes = CryptoJS.AES.decrypt(dataTerenkripsi, master);
+                const passwordAsli = bytes.toString(CryptoJS.enc.Utf8);
+                
+                if(!passwordAsli) throw new Error("Salah sandi");
+
+                boxHasil.classList.remove('hidden');
+                boxHasil.className = "w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all mt-4";
+                boxHasil.innerText = passwordAsli;
+            } catch (e) {
+                boxHasil.classList.remove('hidden');
+                boxHasil.className = "w-full bg-red-900/50 border border-red-500 rounded-lg p-3 text-center text-red-300 mt-4";
+                boxHasil.innerText = "Master Password Salah!";
+            }
+        }
+    </script>
+</body>
+</html>
