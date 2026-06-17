@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brankas Sandi Pribadi</title>
+    <title>Brankas Sandi Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -11,68 +11,81 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            /* Background gradien modern yang bergerak */
             background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             min-height: 100vh;
         }
-
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        /* Efek Glassmorphism (Kaca) */
         .glass-panel {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        /* Animasi muncul (Fade In) saat web dibuka */
-        .fade-in {
-            animation: fadeIn 0.8s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* Custom Scrollbar for inner div */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4fd1c5; border-radius: 10px; }
     </style>
 </head>
 <body class="text-white flex items-center justify-center p-4">
 
-    <div class="glass-panel rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md fade-in">
+    <div class="glass-panel rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
         
-        <h1 class="text-3xl font-semibold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
-            Brankas Sandi
+        <h1 class="text-3xl font-semibold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
+            Brankas Pribadi
         </h1>
+        <p class="text-center text-xs text-gray-400 mb-6">AES-256 Offline Encrypted</p>
 
-        <div class="mb-6">
-            <label class="block text-sm font-medium mb-2 text-gray-300">Master Password (Wajib)</label>
-            <input type="password" id="masterPassword" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition" placeholder="Masukkan kunci rahasia Anda...">
-        </div>
-
-        <hr class="border-gray-600 my-6">
-
-        <div class="mb-6">
-            <h2 class="text-xl font-medium mb-4 text-teal-300">1. Buat Sandi Baru</h2>
-            <div class="flex items-center gap-4 mb-4">
-                <button onclick="uiGeneratePassword()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200">
-                    Acak Sandi Kuat
+        <div class="mb-6 p-4 bg-gray-900/50 rounded-xl border border-gray-700">
+            <label class="block text-sm font-medium mb-2 text-gray-300">Master Password</label>
+            <div class="flex gap-2">
+                <input type="password" id="masterPassword" class="w-full bg-gray-800/80 border border-gray-600 rounded-lg p-2 text-white focus:outline-none focus:border-blue-400" placeholder="Kunci Enkripsi Anda...">
+                <button onclick="uiCekBiometrik()" class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg text-white text-xl" title="Gunakan Biometrik">
+                    👆
                 </button>
             </div>
-            <input type="text" id="hasilGenerate" class="w-full bg-gray-900/80 border border-gray-600 rounded-lg p-3 text-white text-center tracking-widest font-mono" readonly placeholder="Sandi akan muncul di sini">
+            <p id="biometricStatus" class="text-xs text-teal-400 mt-2 hidden">Biometrik berhasil diverifikasi!</p>
+        </div>
+
+        <hr class="border-gray-600 my-4">
+
+        <div class="flex gap-2 mb-4">
+            <button onclick="setMode('sandi')" id="btnSandi" class="w-1/2 bg-blue-500 text-white font-semibold py-2 rounded-lg transition">Mode Sandi</button>
+            <button onclick="setMode('pin')" id="btnPin" class="w-1/2 bg-gray-700 text-gray-300 font-semibold py-2 rounded-lg transition">Mode PIN</button>
+        </div>
+
+        <div class="mb-6 p-4 bg-gray-800/40 rounded-xl">
+            <div class="mb-4 flex justify-between items-center">
+                <label class="text-sm text-gray-300">Panjang Karakter:</label>
+                <span id="lenDisplay" class="font-bold text-teal-400">16</span>
+            </div>
+            <input type="range" id="pwLength" min="4" max="64" value="16" class="w-full mb-4 accent-teal-400" oninput="document.getElementById('lenDisplay').innerText = this.value">
+
+            <div id="opsiSandi" class="grid grid-cols-2 gap-2 text-sm">
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkUpper" checked class="accent-teal-400"> A-Z (Kapital)</label>
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkLower" checked class="accent-teal-400"> a-z (Kecil)</label>
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkNum" checked class="accent-teal-400"> 0-9 (Angka)</label>
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkSym" checked class="accent-teal-400"> !@#$% (Simbol)</label>
+            </div>
         </div>
 
         <div class="mb-6">
-            <label class="block text-sm font-medium mb-2 text-gray-300">Nama Akun (contoh: Instagram, Gmail)</label>
-            <input type="text" id="namaAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 mb-3" placeholder="Nama Akun...">
+            <button onclick="uiGenerate()" class="w-full bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200 mb-3">
+                Acak & Buat Baru
+            </button>
+            <input type="text" id="hasilGenerate" class="w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-white text-center font-mono tracking-widest text-lg" readonly placeholder="...">
+        </div>
+
+        <div class="mb-6">
+            <input type="text" id="namaAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-teal-400 mb-3" placeholder="Nama Akun (Misal: ATM BCA / Gmail)">
             
-            <button onclick="uiSimpanPassword()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200">
+            <button onclick="uiSimpan()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg">
                 Simpan ke Brankas Lokal
             </button>
         </div>
@@ -80,86 +93,199 @@
         <hr class="border-gray-600 my-6">
 
         <div>
-            <h2 class="text-xl font-medium mb-4 text-blue-300">2. Lihat Sandi Tersimpan</h2>
+            <h2 class="text-lg font-medium mb-3 text-blue-300">Cari Akun Tersimpan</h2>
             <input type="text" id="cariAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 mb-3" placeholder="Masukkan Nama Akun...">
             
-            <button onclick="uiAmbilPassword()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200 mb-4">
+            <button onclick="uiAmbil()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg">
                 Buka Brankas
             </button>
 
-            <div id="hasilPencarian" class="hidden w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all">
-                </div>
+            <div id="hasilPencarian" class="hidden w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all mt-4">
+            </div>
         </div>
 
     </div>
 
     <script>
-        // --- LOGIKA INTI ---
-        function generateSecurePassword(length = 16) {
-            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+        let modeAktif = 'sandi'; // 'sandi' atau 'pin'
+
+        // --- MANAJEMEN UI ---
+        function setMode(mode) {
+            modeAktif = mode;
+            const btnSandi = document.getElementById('btnSandi');
+            const btnPin = document.getElementById('btnPin');
+            const opsiSandi = document.getElementById('opsiSandi');
+            const pwLength = document.getElementById('pwLength');
+            const lenDisplay = document.getElementById('lenDisplay');
+
+            if(mode === 'sandi') {
+                btnSandi.className = "w-1/2 bg-blue-500 text-white font-semibold py-2 rounded-lg transition";
+                btnPin.className = "w-1/2 bg-gray-700 text-gray-300 font-semibold py-2 rounded-lg transition";
+                opsiSandi.classList.remove('hidden');
+                pwLength.min = 8;
+                pwLength.max = 64;
+                pwLength.value = 16;
+                lenDisplay.innerText = "16";
+            } else {
+                btnSandi.className = "w-1/2 bg-gray-700 text-gray-300 font-semibold py-2 rounded-lg transition";
+                btnPin.className = "w-1/2 bg-blue-500 text-white font-semibold py-2 rounded-lg transition";
+                opsiSandi.classList.add('hidden'); // Sembunyikan toggle A-Z
+                pwLength.min = 4;
+                pwLength.max = 8;
+                pwLength.value = 6;
+                lenDisplay.innerText = "6";
+            }
+        }
+
+        // --- ALGORITMA GENERATOR CSPRNG ---
+        function generatePasswordCSP(length, upper, lower, num, sym) {
+            let charset = "";
+            if(upper) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if(lower) charset += "abcdefghijklmnopqrstuvwxyz";
+            if(num) charset += "0123456789";
+            if(sym) charset += "!@#$%^&*?";
+
+            if(charset === "") return "Pilih minimal 1 opsi karakter!";
+
             let password = "";
             const randomValues = new Uint32Array(length);
             window.crypto.getRandomValues(randomValues);
+            
             for (let i = 0; i < length; i++) {
                 password += charset[randomValues[i] % charset.length];
             }
             return password;
         }
 
-        // --- PENGHUBUNG ANTARMUKA (UI) ---
-        function uiGeneratePassword() {
-            const sandiBaru = generateSecurePassword();
-            document.getElementById('hasilGenerate').value = sandiBaru;
+        function generatePINCSP(length) {
+            // Pola yang dilarang (Sesuai instruksi Anda)
+            const polaVisualGaris = ["2580", "0852", "1470", "0741", "369", "963"];
+            const polaSudut = ["1397", "7931", "1739", "9371"];
+            const polaBerurutan = ["1234", "2345", "3456", "4567", "5678", "6789", "0123", "9876", "8765", "7654", "6543", "5432", "4321", "3210"];
+            
+            while(true) {
+                let pin = "";
+                const randomValues = new Uint32Array(length);
+                window.crypto.getRandomValues(randomValues);
+                
+                for (let i = 0; i < length; i++) {
+                    pin += (randomValues[i] % 10).toString();
+                }
+
+                // 1. Cek Angka Kembar Berulang (contoh: 1111, 222222)
+                if (/^(\d)\1+$/.test(pin)) continue;
+                
+                // 2. Cek Pola Pasangan Berulang (contoh: 1212, 1122)
+                if (/^(\d\d)\1+$/.test(pin)) continue;
+                if (/^(\d)\1(\d)\2$/.test(pin)) continue;
+
+                // 3. Cek Pola Visual & Berurutan
+                const isBadPattern = [...polaVisualGaris, ...polaSudut, ...polaBerurutan].some(pola => pin.includes(pola));
+                if (isBadPattern) continue;
+
+                return pin; // Lolos semua ujian keamanan
+            }
         }
 
-        function uiSimpanPassword() {
+        // --- PENGHUBUNG UI ---
+        function uiGenerate() {
+            const len = parseInt(document.getElementById('pwLength').value);
+            let hasil = "";
+
+            if (modeAktif === 'sandi') {
+                const up = document.getElementById('chkUpper').checked;
+                const low = document.getElementById('chkLower').checked;
+                const num = document.getElementById('chkNum').checked;
+                const sym = document.getElementById('chkSym').checked;
+                hasil = generatePasswordCSP(len, up, low, num, sym);
+            } else {
+                hasil = generatePINCSP(len);
+            }
+
+            document.getElementById('hasilGenerate').value = hasil;
+        }
+
+        function uiSimpan() {
             const master = document.getElementById('masterPassword').value;
-            const sandi = document.getElementById('hasilGenerate').value;
+            const data = document.getElementById('hasilGenerate').value;
             const akun = document.getElementById('namaAkun').value.trim().toLowerCase();
 
-            if (!master) return alert("Master Password wajib diisi untuk mengenkripsi data!");
-            if (!sandi) return alert("Buat sandi terlebih dahulu!");
+            if (!master) return alert("Master Password wajib diisi!");
+            if (!data) return alert("Buat sandi/PIN terlebih dahulu!");
             if (!akun) return alert("Masukkan nama akun!");
 
-            // Enkripsi dan simpan
-            const teksTerenkripsi = CryptoJS.AES.encrypt(sandi, master).toString();
-            localStorage.setItem("brankas_" + akun, teksTerenkripsi);
+            const teksTerenkripsi = CryptoJS.AES.encrypt(data, master).toString();
+            localStorage.setItem("br_" + akun, teksTerenkripsi);
             
-            alert(`Sandi untuk ${akun} berhasil dikunci dan disimpan di perangkat ini!`);
+            alert(`Tersimpan! Akun: ${akun}`);
             document.getElementById('namaAkun').value = '';
             document.getElementById('hasilGenerate').value = '';
         }
 
-        function uiAmbilPassword() {
+        function uiAmbil() {
             const master = document.getElementById('masterPassword').value;
             const akun = document.getElementById('cariAkun').value.trim().toLowerCase();
-            const boxHasil = document.getElementById('hasilPencarian');
+            const box = document.getElementById('hasilPencarian');
 
-            if (!master) return alert("Masukkan Master Password Anda!");
-            if (!akun) return alert("Masukkan nama akun yang ingin dicari!");
+            if (!master || !akun) return alert("Isi Master Password dan Nama Akun!");
 
-            const dataTerenkripsi = localStorage.getItem("brankas_" + akun);
-            
-            if (!dataTerenkripsi) {
-                boxHasil.classList.remove('hidden');
-                boxHasil.className = "w-full bg-red-900/50 border border-red-500 rounded-lg p-3 text-center text-red-300 mt-4";
-                boxHasil.innerText = "Akun tidak ditemukan!";
+            const encrypted = localStorage.getItem("br_" + akun);
+            if (!encrypted) {
+                tampilPesan(box, "Akun tidak ditemukan!", false);
                 return;
             }
 
             try {
-                const bytes = CryptoJS.AES.decrypt(dataTerenkripsi, master);
-                const passwordAsli = bytes.toString(CryptoJS.enc.Utf8);
+                const bytes = CryptoJS.AES.decrypt(encrypted, master);
+                const asli = bytes.toString(CryptoJS.enc.Utf8);
                 
-                if(!passwordAsli) throw new Error("Salah sandi");
-
-                boxHasil.classList.remove('hidden');
-                boxHasil.className = "w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all mt-4";
-                boxHasil.innerText = passwordAsli;
+                if(!asli) throw new Error();
+                tampilPesan(box, asli, true);
             } catch (e) {
-                boxHasil.classList.remove('hidden');
-                boxHasil.className = "w-full bg-red-900/50 border border-red-500 rounded-lg p-3 text-center text-red-300 mt-4";
-                boxHasil.innerText = "Master Password Salah!";
+                tampilPesan(box, "Master Password Salah!", false);
+            }
+        }
+
+        function tampilPesan(elemen, teks, sukses) {
+            elemen.classList.remove('hidden');
+            if (sukses) {
+                elemen.className = "w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all mt-4 text-xl";
+            } else {
+                elemen.className = "w-full bg-red-900/50 border border-red-500 rounded-lg p-3 text-center text-red-300 mt-4";
+            }
+            elemen.innerText = teks;
+        }
+
+        // --- FITUR BIOMETRIK (WebAuthn Dasar) ---
+        // Catatan: Ini memanggil prompt Sidik Jari bawaan OS (jika didukung browser).
+        async function uiCekBiometrik() {
+            if (!window.PublicKeyCredential) {
+                alert("Browser/Perangkat Anda tidak mendukung Web Biometrik.");
+                return;
+            }
+            try {
+                // Membuat challenge palsu karena kita offline tanpa server
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                
+                // Memicu prompt sistem biometrik (TouchID/FaceID/Fingerprint)
+                const assertion = await navigator.credentials.get({
+                    publicKey: {
+                        challenge: challenge,
+                        timeout: 60000,
+                        userVerification: "required" // Memaksa OS meminta sidik jari/wajah
+                    }
+                });
+                
+                if (assertion) {
+                    document.getElementById('biometricStatus').classList.remove('hidden');
+                    // Karena biometrik tidak memberikan Master Password, Anda tetap butuh Master Password
+                    // di input box, TAPI ini berguna jika Anda menyimpan hash lokal.
+                    // Untuk saat ini, kita beri visual indikator sukses.
+                    alert("Biometrik Terverifikasi! (Pastikan Master Password tetap terisi untuk Dekripsi AES)");
+                }
+            } catch (error) {
+                alert("Gagal memverifikasi biometrik: " + error.message);
             }
         }
     </script>
