@@ -3,111 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brankas Sandi Pro</title>
+    <title>Brankas Sandi Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        onyx: '#020202',
+                        carbon: '#171717',
+                        candyblue: '#B2D5E5'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium-float': '0 12px 30px -5px rgba(255, 255, 255, 0.08)',
+                        'premium-hover': '0 20px 40px -5px rgba(255, 255, 255, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
     
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-color: #020202; /* Onyx */
             min-height: 100vh;
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        /* Custom Scrollbar for inner div */
-        ::-webkit-scrollbar { width: 6px; }
+        
+        /* Custom Scrollbar for premium feel */
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #4fd1c5; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #B2D5E5; }
+
+        /* Sembunyikan panah pada input number di beberapa browser */
+        input[type="range"] {
+            accent-color: #B2D5E5;
+        }
     </style>
 </head>
-<body class="text-white flex items-center justify-center p-4">
+<body class="text-gray-300 flex items-center justify-center p-4">
 
-    <div class="glass-panel rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="bg-carbon rounded-[32px] shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[95vh] overflow-y-auto border border-gray-800/50">
         
-        <h1 class="text-3xl font-semibold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
+        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">
             Brankas Pribadi
         </h1>
-        <p class="text-center text-xs text-gray-400 mb-6">AES-256 Offline Encrypted</p>
+        <p class="text-center text-[10px] text-gray-500 mb-8 uppercase tracking-widest">AES-256 Offline Encrypted</p>
 
-        <div class="mb-6 p-4 bg-gray-900/50 rounded-xl border border-gray-700">
-            <label class="block text-sm font-medium mb-2 text-gray-300">Master Password</label>
-            <div class="flex gap-2">
-                <input type="password" id="masterPassword" class="w-full bg-gray-800/80 border border-gray-600 rounded-lg p-2 text-white focus:outline-none focus:border-blue-400" placeholder="Kunci Enkripsi Anda...">
-                <button onclick="uiCekBiometrik()" class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg text-white text-xl" title="Gunakan Biometrik">
-                    👆
+        <div class="mb-6 bg-onyx rounded-3xl p-4 border border-gray-800/50">
+            <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Master Password</label>
+            <div class="flex gap-3">
+                <input type="password" id="masterPassword" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue transition-colors" placeholder="Kunci Enkripsi Anda...">
+                
+                <button onclick="uiCekBiometrik()" class="bg-carbon border border-gray-800 hover:border-candyblue hover:text-candyblue text-gray-400 p-3 rounded-full transition-all duration-300 flex items-center justify-center aspect-square" title="Gunakan Biometrik">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
                 </button>
             </div>
-            <p id="biometricStatus" class="text-xs text-teal-400 mt-2 hidden">Biometrik berhasil diverifikasi!</p>
         </div>
 
-        <hr class="border-gray-600 my-4">
-
-        <div class="flex gap-2 mb-4">
-            <button onclick="setMode('sandi')" id="btnSandi" class="w-1/2 bg-blue-500 text-white font-semibold py-2 rounded-lg transition">Mode Sandi</button>
-            <button onclick="setMode('pin')" id="btnPin" class="w-1/2 bg-gray-700 text-gray-300 font-semibold py-2 rounded-lg transition">Mode PIN</button>
-        </div>
-
-        <div class="mb-6 p-4 bg-gray-800/40 rounded-xl">
-            <div class="mb-4 flex justify-between items-center">
-                <label class="text-sm text-gray-300">Panjang Karakter:</label>
-                <span id="lenDisplay" class="font-bold text-teal-400">16</span>
-            </div>
-            <input type="range" id="pwLength" min="4" max="64" value="16" class="w-full mb-4 accent-teal-400" oninput="document.getElementById('lenDisplay').innerText = this.value">
-
-            <div id="opsiSandi" class="grid grid-cols-2 gap-2 text-sm">
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkUpper" checked class="accent-teal-400"> A-Z (Kapital)</label>
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkLower" checked class="accent-teal-400"> a-z (Kecil)</label>
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkNum" checked class="accent-teal-400"> 0-9 (Angka)</label>
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkSym" checked class="accent-teal-400"> !@#$% (Simbol)</label>
-            </div>
+        <div class="flex gap-3 mb-6 bg-onyx p-1.5 rounded-full border border-gray-800/50">
+            <button onclick="setMode('sandi')" id="btnSandi" class="w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float">Mode Sandi</button>
+            <button onclick="setMode('pin')" id="btnPin" class="w-1/2 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all">Mode PIN</button>
         </div>
 
         <div class="mb-6">
-            <button onclick="uiGenerate()" class="w-full bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-200 mb-3">
-                Acak & Buat Baru
-            </button>
-            <input type="text" id="hasilGenerate" class="w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-white text-center font-mono tracking-widest text-lg" readonly placeholder="...">
+            <div class="mb-4 flex justify-between items-center pl-2">
+                <label class="text-xs text-gray-400">Panjang Karakter:</label>
+                <span id="lenDisplay" class="font-semibold text-candyblue text-sm">16</span>
+            </div>
+            <input type="range" id="pwLength" min="4" max="64" value="16" class="w-full mb-5" oninput="document.getElementById('lenDisplay').innerText = this.value">
+
+            <div id="opsiSandi" class="grid grid-cols-2 gap-3 text-xs text-gray-300">
+                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkUpper" checked> A-Z (Kapital)</label>
+                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkLower" checked> a-z (Kecil)</label>
+                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkNum" checked> 0-9 (Angka)</label>
+                <label class="flex items-center gap-3 bg-onyx p-3 rounded-2xl border border-gray-800/50 cursor-pointer hover:border-gray-700 transition"><input type="checkbox" id="chkSym" checked> !@#$% (Simbol)</label>
+            </div>
         </div>
 
-        <div class="mb-6">
-            <input type="text" id="namaAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-teal-400 mb-3" placeholder="Nama Akun (Misal: ATM BCA / Gmail)">
+        <div class="mb-8 relative">
+            <input type="text" id="hasilGenerate" class="w-full bg-onyx border border-gray-800 rounded-3xl p-5 pb-16 text-white text-center font-mono tracking-widest text-lg focus:outline-none" readonly placeholder="••••••••">
             
-            <button onclick="uiSimpan()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg">
-                Simpan ke Brankas Lokal
+            <div class="absolute bottom-2 left-2 right-2">
+                <button onclick="uiGenerate()" class="w-full bg-carbon text-white text-xs uppercase tracking-wider font-semibold py-3 rounded-full hover:bg-gray-800 transition duration-300 border border-gray-700">
+                    Acak Sandi Baru
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Simpan Akun Baru</label>
+            <input type="text" id="namaAkun" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-4 transition-colors" placeholder="Nama Akun (Misal: Gmail, BCA)">
+            
+            <button onclick="uiSimpan()" class="w-full bg-candyblue text-onyx font-semibold py-3.5 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transform hover:-translate-y-1 transition-all duration-300">
+                Simpan ke Brankas
             </button>
         </div>
 
-        <hr class="border-gray-600 my-6">
+        <hr class="border-gray-800 my-8">
 
         <div>
-            <h2 class="text-lg font-medium mb-3 text-blue-300">Cari Akun Tersimpan</h2>
-            <input type="text" id="cariAkun" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400 mb-3" placeholder="Masukkan Nama Akun...">
+            <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Buka Brankas</label>
+            <input type="text" id="cariAkun" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-4 transition-colors" placeholder="Masukkan Nama Akun...">
             
-            <button onclick="uiAmbil()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg">
-                Buka Brankas
+            <button onclick="uiAmbil()" class="w-full bg-carbon border border-gray-700 text-white hover:border-candyblue hover:text-candyblue font-medium py-3.5 px-4 rounded-full transition-all duration-300">
+                Tampilkan Sandi
             </button>
 
-            <div id="hasilPencarian" class="hidden w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all mt-4">
+            <div id="hasilPencarian" class="hidden w-full bg-onyx border border-candyblue/50 rounded-2xl p-4 text-center text-candyblue font-mono tracking-widest break-all mt-4 text-lg">
             </div>
         </div>
 
     </div>
 
     <script>
-        let modeAktif = 'sandi'; // 'sandi' atau 'pin'
+        let modeAktif = 'sandi'; 
 
         // --- MANAJEMEN UI ---
         function setMode(mode) {
@@ -118,18 +136,22 @@
             const pwLength = document.getElementById('pwLength');
             const lenDisplay = document.getElementById('lenDisplay');
 
+            // Style class for Active/Inactive Tab
+            const activeClass = "w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float";
+            const inactiveClass = "w-1/2 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all";
+
             if(mode === 'sandi') {
-                btnSandi.className = "w-1/2 bg-blue-500 text-white font-semibold py-2 rounded-lg transition";
-                btnPin.className = "w-1/2 bg-gray-700 text-gray-300 font-semibold py-2 rounded-lg transition";
+                btnSandi.className = activeClass;
+                btnPin.className = inactiveClass;
                 opsiSandi.classList.remove('hidden');
                 pwLength.min = 8;
                 pwLength.max = 64;
                 pwLength.value = 16;
                 lenDisplay.innerText = "16";
             } else {
-                btnSandi.className = "w-1/2 bg-gray-700 text-gray-300 font-semibold py-2 rounded-lg transition";
-                btnPin.className = "w-1/2 bg-blue-500 text-white font-semibold py-2 rounded-lg transition";
-                opsiSandi.classList.add('hidden'); // Sembunyikan toggle A-Z
+                btnSandi.className = inactiveClass;
+                btnPin.className = activeClass;
+                opsiSandi.classList.add('hidden');
                 pwLength.min = 4;
                 pwLength.max = 8;
                 pwLength.value = 6;
@@ -145,20 +167,16 @@
             if(num) charset += "0123456789";
             if(sym) charset += "!@#$%^&*?";
 
-            if(charset === "") return "Pilih minimal 1 opsi karakter!";
+            if(charset === "") return "Pilih minimal 1 opsi!";
 
             let password = "";
             const randomValues = new Uint32Array(length);
             window.crypto.getRandomValues(randomValues);
-            
-            for (let i = 0; i < length; i++) {
-                password += charset[randomValues[i] % charset.length];
-            }
+            for (let i = 0; i < length; i++) password += charset[randomValues[i] % charset.length];
             return password;
         }
 
         function generatePINCSP(length) {
-            // Pola yang dilarang (Sesuai instruksi Anda)
             const polaVisualGaris = ["2580", "0852", "1470", "0741", "369", "963"];
             const polaSudut = ["1397", "7931", "1739", "9371"];
             const polaBerurutan = ["1234", "2345", "3456", "4567", "5678", "6789", "0123", "9876", "8765", "7654", "6543", "5432", "4321", "3210"];
@@ -167,23 +185,11 @@
                 let pin = "";
                 const randomValues = new Uint32Array(length);
                 window.crypto.getRandomValues(randomValues);
-                
-                for (let i = 0; i < length; i++) {
-                    pin += (randomValues[i] % 10).toString();
-                }
-
-                // 1. Cek Angka Kembar Berulang (contoh: 1111, 222222)
+                for (let i = 0; i < length; i++) pin += (randomValues[i] % 10).toString();
                 if (/^(\d)\1+$/.test(pin)) continue;
-                
-                // 2. Cek Pola Pasangan Berulang (contoh: 1212, 1122)
-                if (/^(\d\d)\1+$/.test(pin)) continue;
-                if (/^(\d)\1(\d)\2$/.test(pin)) continue;
-
-                // 3. Cek Pola Visual & Berurutan
-                const isBadPattern = [...polaVisualGaris, ...polaSudut, ...polaBerurutan].some(pola => pin.includes(pola));
-                if (isBadPattern) continue;
-
-                return pin; // Lolos semua ujian keamanan
+                if (/^(\d\d)\1+$/.test(pin) || /^(\d)\1(\d)\2$/.test(pin)) continue;
+                if ([...polaVisualGaris, ...polaSudut, ...polaBerurutan].some(pola => pin.includes(pola))) continue;
+                return pin; 
             }
         }
 
@@ -191,7 +197,6 @@
         function uiGenerate() {
             const len = parseInt(document.getElementById('pwLength').value);
             let hasil = "";
-
             if (modeAktif === 'sandi') {
                 const up = document.getElementById('chkUpper').checked;
                 const low = document.getElementById('chkLower').checked;
@@ -201,7 +206,6 @@
             } else {
                 hasil = generatePINCSP(len);
             }
-
             document.getElementById('hasilGenerate').value = hasil;
         }
 
@@ -217,7 +221,7 @@
             const teksTerenkripsi = CryptoJS.AES.encrypt(data, master).toString();
             localStorage.setItem("br_" + akun, teksTerenkripsi);
             
-            alert(`Tersimpan! Akun: ${akun}`);
+            alert(`Sandi untuk ${akun} berhasil diamankan!`);
             document.getElementById('namaAkun').value = '';
             document.getElementById('hasilGenerate').value = '';
         }
@@ -238,54 +242,37 @@
             try {
                 const bytes = CryptoJS.AES.decrypt(encrypted, master);
                 const asli = bytes.toString(CryptoJS.enc.Utf8);
-                
                 if(!asli) throw new Error();
                 tampilPesan(box, asli, true);
             } catch (e) {
-                tampilPesan(box, "Master Password Salah!", false);
+                tampilPesan(box, "Akses Ditolak: Master Password Salah!", false);
             }
         }
 
         function tampilPesan(elemen, teks, sukses) {
             elemen.classList.remove('hidden');
             if (sukses) {
-                elemen.className = "w-full bg-gray-900 border border-teal-500 rounded-lg p-3 text-center text-teal-300 font-mono tracking-widest break-all mt-4 text-xl";
+                elemen.className = "w-full bg-onyx border border-candyblue/50 rounded-2xl p-4 text-center text-candyblue font-mono tracking-widest break-all mt-4 text-lg";
             } else {
-                elemen.className = "w-full bg-red-900/50 border border-red-500 rounded-lg p-3 text-center text-red-300 mt-4";
+                elemen.className = "w-full bg-red-950/30 border border-red-900 rounded-2xl p-4 text-center text-red-500 text-sm mt-4";
             }
             elemen.innerText = teks;
         }
 
-        // --- FITUR BIOMETRIK (WebAuthn Dasar) ---
-        // Catatan: Ini memanggil prompt Sidik Jari bawaan OS (jika didukung browser).
         async function uiCekBiometrik() {
             if (!window.PublicKeyCredential) {
-                alert("Browser/Perangkat Anda tidak mendukung Web Biometrik.");
+                alert("Perangkat tidak mendukung biometrik browser.");
                 return;
             }
             try {
-                // Membuat challenge palsu karena kita offline tanpa server
                 const challenge = new Uint8Array(32);
                 window.crypto.getRandomValues(challenge);
-                
-                // Memicu prompt sistem biometrik (TouchID/FaceID/Fingerprint)
                 const assertion = await navigator.credentials.get({
-                    publicKey: {
-                        challenge: challenge,
-                        timeout: 60000,
-                        userVerification: "required" // Memaksa OS meminta sidik jari/wajah
-                    }
+                    publicKey: { challenge: challenge, timeout: 60000, userVerification: "required" }
                 });
-                
-                if (assertion) {
-                    document.getElementById('biometricStatus').classList.remove('hidden');
-                    // Karena biometrik tidak memberikan Master Password, Anda tetap butuh Master Password
-                    // di input box, TAPI ini berguna jika Anda menyimpan hash lokal.
-                    // Untuk saat ini, kita beri visual indikator sukses.
-                    alert("Biometrik Terverifikasi! (Pastikan Master Password tetap terisi untuk Dekripsi AES)");
-                }
+                if (assertion) alert("Autentikasi Biometrik berhasil dilewati.");
             } catch (error) {
-                alert("Gagal memverifikasi biometrik: " + error.message);
+                console.log(error);
             }
         }
     </script>
