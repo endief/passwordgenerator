@@ -30,20 +30,14 @@
     </script>
     
     <style>
-        body {
-            background-color: #020202; 
-            min-height: 100vh;
-        }
-        
+        body { background-color: #020202; min-height: 100vh; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #B2D5E5; }
         input[type="range"] { accent-color: #B2D5E5; }
 
-        /* ======================================================= */
-        /* ========== KODE ANIMASI DARI PENGGUNA ================= */
-        /* ======================================================= */
+        /* KODE ANIMASI DARI PENGGUNA */
         .premium-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(15,23,42,0.4); backdrop-filter: blur(6px);
@@ -51,36 +45,21 @@
             z-index: 9999; opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .premium-overlay.show { opacity: 1; visibility: visible; }
-
         .premium-card {
             background: white; border-radius: 32px; padding: 40px 30px;
             box-shadow: 0 24px 48px rgba(0,0,0,0.15); text-align: center;
-            width: 90%; max-width: 320px; 
-            transform: scale(0.9) translateY(15px); 
-            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            width: 90%; max-width: 320px; transform: scale(0.9) translateY(15px); transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
         .premium-overlay.show .premium-card { transform: scale(1) translateY(0); }
-
-        .p-icon-container {
-            position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto;
-            display: flex; justify-content: center; align-items: center;
-        }
-
+        .p-icon-container { position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; }
         .p-circle {
             position: absolute; width: 64px; height: 64px; border-radius: 50%;
             background: #0F2D5C; top: 50%; left: 50%; margin: -32px 0 0 -32px;
-            transform: scale(0); opacity: 0;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s ease;
-            z-index: 1;
+            transform: scale(0); opacity: 0; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s ease; z-index: 1;
         }
         .is-finished .p-circle { transform: scale(1); opacity: 1; }
-
         .is-success .p-circle { background: #10b981; } 
         .is-error .p-circle { background: #ef4444; }   
-        .is-loading .p-circle { background: #0F2D5C; transform: scale(1); opacity: 1; animation: p-pulse 1.5s infinite; } 
-
-        @keyframes p-pulse { 0% { transform: scale(0.9); } 50% { transform: scale(1); } 100% { transform: scale(0.9); } }
-
         .p-svg {
             position: absolute; width: 32px; height: 32px; top: 50%; left: 50%; margin: -16px 0 0 -16px;
             fill: none; stroke: white; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
@@ -88,7 +67,6 @@
         }
         .is-finished .p-svg { animation: p-draw 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.2s; }
         @keyframes p-draw { to { stroke-dashoffset: 0; } }
-
         .p-ripple {
             position: absolute; width: 64px; height: 64px; border-radius: 50%;
             border: 2px solid transparent; top: 50%; left: 50%; margin: -32px 0 0 -32px;
@@ -97,11 +75,8 @@
         .is-success .p-ripple { border-color: #10b981; animation: p-rip 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
         .is-error .p-ripple { border-color: #ef4444; animation: p-rip 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
         @keyframes p-rip { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
-
         .is-finished .p-icon-container { animation: p-bounce-soft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s; }
         @keyframes p-bounce-soft { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
-        
-        /* Animasi Transisi View */
         .fade-enter { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -120,7 +95,6 @@
 
 
         <div id="viewGenerator" class="fade-enter block">
-            
             <div class="flex gap-3 mb-6 bg-onyx p-1.5 rounded-full border border-gray-800/50">
                 <button onclick="setMode('sandi')" id="btnSandi" class="w-1/2 bg-gray-700 text-white font-semibold py-2 rounded-full text-sm transition-all shadow-sm">Mode Sandi</button>
                 <button onclick="setMode('pin')" id="btnPin" class="w-1/2 text-gray-400 hover:text-white font-medium py-2 rounded-full text-sm transition-all">Mode PIN</button>
@@ -143,17 +117,19 @@
 
             <div class="mb-2 relative">
                 <input type="text" id="hasilGenerate" class="w-full bg-onyx border border-gray-800 rounded-3xl p-5 pb-16 text-white text-center font-mono tracking-widest text-lg focus:outline-none" readonly placeholder="••••••••">
-                
                 <div class="absolute bottom-2 left-2 right-2 flex gap-2">
-                    <button onclick="uiGenerate()" class="w-2/3 bg-carbon text-white text-xs uppercase tracking-wider font-semibold py-3 rounded-full hover:bg-gray-800 transition duration-300 border border-gray-700">
-                        Acak Baru
-                    </button>
-                    <button onclick="salinDariGenerator()" class="w-1/3 bg-candyblue text-onyx text-xs uppercase tracking-wider font-bold py-3 rounded-full shadow-premium-float hover:shadow-premium-hover transition duration-300">
-                        Salin
-                    </button>
+                    <button onclick="uiGenerate()" class="w-2/3 bg-carbon text-white text-xs uppercase tracking-wider font-semibold py-3 rounded-full hover:bg-gray-800 transition duration-300 border border-gray-700">Acak Baru</button>
+                    <button onclick="salinDariGenerator()" class="w-1/3 bg-candyblue text-onyx text-xs uppercase tracking-wider font-bold py-3 rounded-full shadow-premium-float hover:shadow-premium-hover transition duration-300">Salin</button>
                 </div>
             </div>
-            <p class="text-[10px] text-gray-500 text-center mt-4">Gunakan Tab Brankas untuk menyimpan sandi.</p>
+
+            <div class="mt-6 p-4 bg-onyx rounded-3xl border border-gray-800/50">
+                <label class="block text-[11px] font-medium mb-3 text-gray-400 pl-2 uppercase tracking-wider">Simpan Cepat ke Brankas</label>
+                <input type="text" id="genNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Gmail)">
+                <button onclick="promptSaveFromGenerator()" class="w-full bg-carbon border border-gray-700 text-white hover:text-candyblue hover:border-candyblue font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm">
+                    Simpan Sandi Ini
+                </button>
+            </div>
         </div>
 
 
@@ -164,9 +140,7 @@
                 </div>
                 <h3 class="text-white font-medium mb-1">Akses Brankas</h3>
                 <p class="text-[10px] text-gray-500 mb-5">Masukkan Master Password untuk membuka atau membuat brankas baru.</p>
-
                 <input type="password" id="loginMasterPass" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3.5 text-white text-sm text-center focus:outline-none focus:border-candyblue transition-colors mb-4" placeholder="Kunci Rahasia Utama...">
-                
                 <button onclick="prosesLoginBrankas()" class="w-full bg-candyblue text-onyx font-semibold py-3.5 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transform hover:-translate-y-1 transition-all duration-300">
                     Buka Brankas
                 </button>
@@ -175,7 +149,6 @@
 
 
         <div id="viewVaultDash" class="hidden fade-enter">
-            
             <div class="flex justify-between items-center mb-5 px-1">
                 <span class="text-xs font-semibold text-candyblue uppercase tracking-widest flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-candyblue animate-pulse"></span> Brankas Terbuka
@@ -186,25 +159,18 @@
             <div class="mb-6 p-4 bg-onyx rounded-3xl border border-gray-800/50">
                 <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Tambah Data Baru</label>
                 <input type="text" id="vNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Gmail)">
-                
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="vPassword" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm font-mono focus:outline-none focus:border-candyblue transition-colors" placeholder="Password / PIN">
                     <button onclick="uiGenerateQuick()" class="bg-carbon border border-gray-800 hover:border-candyblue hover:text-candyblue text-gray-400 px-4 rounded-full text-xs font-semibold transition-all">Acak</button>
                 </div>
-
                 <button onclick="uiSimpanKeBrankas()" class="w-full bg-candyblue text-onyx font-semibold py-3 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transition-all">
                     Simpan Data
                 </button>
             </div>
 
             <hr class="border-gray-800 my-6">
-
-            <div class="mb-3 px-1">
-                <h4 class="text-xs font-medium text-gray-400">Data Tersimpan</h4>
-            </div>
-            
-            <div id="passwordContainer" class="space-y-3 pb-4">
-                </div>
+            <div class="mb-3 px-1"><h4 class="text-xs font-medium text-gray-400">Data Tersimpan</h4></div>
+            <div id="passwordContainer" class="space-y-3 pb-4"></div>
         </div>
 
     </div>
@@ -212,7 +178,7 @@
     <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
         <div class="bg-carbon border border-gray-800 rounded-3xl p-6 w-[90%] max-w-sm text-center shadow-2xl transform scale-95 transition-transform duration-300" id="authModalBox">
             <h3 class="text-base font-semibold text-white mb-2">Keamanan Berlapis</h3>
-            <p class="text-[11px] text-gray-400 mb-5">Masukkan kembali Master Password Anda untuk konfirmasi tindakan.</p>
+            <p id="authModalDesc" class="text-[11px] text-gray-400 mb-5">Masukkan kembali Master Password Anda untuk konfirmasi tindakan.</p>
             
             <input type="password" id="authInput" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm text-center focus:outline-none focus:border-candyblue mb-5" placeholder="Master Password...">
             
@@ -238,7 +204,6 @@
     </div>
 
     <script>
-        // --- STATE & VARIABEL ---
         let currentTab = 'generator'; 
         let activeMasterPass = null; 
         let currentLoadedVault = []; 
@@ -246,10 +211,8 @@
         let pendingAction = null; 
         let pendingTargetId = null;
 
-        // Inisialisasi awal generator
         setMode('sandi');
 
-        // --- SISTEM NAVIGASI TAB ---
         function switchTab(tab) {
             currentTab = tab;
             const btnGen = document.getElementById('tabGenerator');
@@ -261,7 +224,6 @@
             const activeClass = "w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float";
             const inactiveClass = "w-1/2 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all";
 
-            // Reset View
             viewGen.classList.add('hidden');
             viewLogin.classList.add('hidden');
             viewDash.classList.add('hidden');
@@ -274,16 +236,12 @@
                 btnGen.className = inactiveClass;
                 btnVault.className = activeClass;
                 
-                // Cek apakah sudah login brankas
-                if(activeMasterPass) {
-                    viewDash.classList.remove('hidden');
-                } else {
-                    viewLogin.classList.remove('hidden');
-                }
+                if(activeMasterPass) viewDash.classList.remove('hidden');
+                else viewLogin.classList.remove('hidden');
             }
         }
 
-        // --- DASHBOARD 1: LOGIKA GENERATOR ---
+        // --- GENERATOR LOGIC ---
         function setMode(mode) {
             const btnSandi = document.getElementById('btnSandi');
             const btnPin = document.getElementById('btnPin');
@@ -295,17 +253,13 @@
             const inactiveClass = "w-1/2 text-gray-400 hover:text-white font-medium py-2 rounded-full text-sm transition-all";
 
             if(mode === 'sandi') {
-                btnSandi.className = activeClass;
-                btnPin.className = inactiveClass;
+                btnSandi.className = activeClass; btnPin.className = inactiveClass;
                 opsiSandi.classList.remove('hidden');
-                pwLength.min = 8; pwLength.max = 64; pwLength.value = 16;
-                lenDisplay.innerText = "16";
+                pwLength.min = 8; pwLength.max = 64; pwLength.value = 16; lenDisplay.innerText = "16";
             } else {
-                btnSandi.className = inactiveClass;
-                btnPin.className = activeClass;
+                btnSandi.className = inactiveClass; btnPin.className = activeClass;
                 opsiSandi.classList.add('hidden');
-                pwLength.min = 4; pwLength.max = 8; pwLength.value = 6;
-                lenDisplay.innerText = "6";
+                pwLength.min = 4; pwLength.max = 8; pwLength.value = 6; lenDisplay.innerText = "6";
             }
         }
 
@@ -313,9 +267,7 @@
             if(type === 'pin') {
                 const polaBlock = ["2580", "0852", "1470", "0741", "369", "963", "1397", "7931", "1739", "9371", "1234", "2345", "3456", "4567", "5678", "6789", "0123", "9876", "8765", "7654", "6543", "5432", "4321", "3210"];
                 while(true) {
-                    let pin = "";
-                    const rv = new Uint32Array(length);
-                    window.crypto.getRandomValues(rv);
+                    let pin = ""; const rv = new Uint32Array(length); window.crypto.getRandomValues(rv);
                     for (let i = 0; i < length; i++) pin += (rv[i] % 10).toString();
                     if (/^(\d)\1+$/.test(pin) || /^(\d\d)\1+$/.test(pin) || /^(\d)\1(\d)\2$/.test(pin)) continue;
                     if (polaBlock.some(p => pin.includes(p))) continue;
@@ -329,9 +281,7 @@
                 if(document.getElementById('chkSym').checked) chars += "!@#$%^&*?";
                 if(chars === "") return "Pilih minimal 1 opsi!";
                 
-                let pass = "";
-                const rv = new Uint32Array(length);
-                window.crypto.getRandomValues(rv);
+                let pass = ""; const rv = new Uint32Array(length); window.crypto.getRandomValues(rv);
                 for (let i = 0; i < length; i++) pass += chars[rv[i] % chars.length];
                 return pass;
             }
@@ -349,11 +299,31 @@
             navigator.clipboard.writeText(val).then(() => triggerCustomAlert('success', 'Tersalin', 'Sandi disalin ke clipboard!'));
         }
 
+        // --- FITUR BARU: SIMPAN CEPAT DARI GENERATOR ---
+        function promptSaveFromGenerator() {
+            const akun = document.getElementById('genNamaAkun').value.trim();
+            const sandi = document.getElementById('hasilGenerate').value;
 
-        // --- DASHBOARD 2: LOGIKA BRANKAS ---
-        function getStorageKey(mp) {
-            return "vlt_" + CryptoJS.SHA256(mp).toString();
+            if(!sandi) return triggerCustomAlert('error', 'Gagal', 'Silakan acak sandi terlebih dahulu.');
+            if(!akun) return triggerCustomAlert('error', 'Gagal', 'Nama akun wajib diisi.');
+
+            pendingAction = 'save_from_gen';
+            pendingTargetId = null;
+
+            document.getElementById('authModalDesc').innerText = "Masukkan Master Password ke mana sandi ini akan disimpan.";
+            
+            const modal = document.getElementById('authModal');
+            const modalBox = document.getElementById('authModalBox');
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => modalBox.classList.remove('scale-95'), 10);
+            
+            document.getElementById('authInput').value = "";
+            document.getElementById('authInput').focus();
         }
+
+        // --- BRANKAS LOGIC ---
+        function getStorageKey(mp) { return "vlt_" + CryptoJS.SHA256(mp).toString(); }
 
         function prosesLoginBrankas() {
             const mp = document.getElementById('loginMasterPass').value;
@@ -368,39 +338,29 @@
                     const dec = bytes.toString(CryptoJS.enc.Utf8);
                     if(!dec) throw new Error();
                     currentLoadedVault = JSON.parse(dec);
-                } catch(e) {
-                    return triggerCustomAlert('error', 'Akses Ditolak', 'Master Password salah.');
-                }
+                } catch(e) { return triggerCustomAlert('error', 'Akses Ditolak', 'Master Password salah.'); }
             } else {
-                currentLoadedVault = []; // Brankas baru
+                currentLoadedVault = []; 
             }
 
             activeMasterPass = mp;
             revealedItems = {};
             document.getElementById('loginMasterPass').value = "";
             
-            // Render View Dash
             document.getElementById('viewVaultLogin').classList.add('hidden');
             document.getElementById('viewVaultDash').classList.remove('hidden');
             renderCards();
         }
 
         function prosesKunciBrankas() {
-            activeMasterPass = null;
-            currentLoadedVault = [];
-            revealedItems = {};
-            
-            // Kembali ke Login View
+            activeMasterPass = null; currentLoadedVault = []; revealedItems = {};
             document.getElementById('viewVaultDash').classList.add('hidden');
             document.getElementById('viewVaultLogin').classList.remove('hidden');
         }
 
         function uiGenerateQuick() {
-            // Pembuat Sandi Acak Cepat (16 Char Mix) untuk Form Brankas
             let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-            let pass = "";
-            const rv = new Uint32Array(16);
-            window.crypto.getRandomValues(rv);
+            let pass = ""; const rv = new Uint32Array(16); window.crypto.getRandomValues(rv);
             for (let i = 0; i < 16; i++) pass += chars[rv[i] % chars.length];
             document.getElementById('vPassword').value = pass;
         }
@@ -408,23 +368,13 @@
         function uiSimpanKeBrankas() {
             const akun = document.getElementById('vNamaAkun').value.trim();
             const sandi = document.getElementById('vPassword').value;
-
             if(!akun || !sandi) return triggerCustomAlert('error', 'Gagal', 'Nama Akun dan Password wajib diisi.');
 
-            const newItem = {
-                id: 'id_' + Date.now(),
-                account: akun,
-                ciphertext: CryptoJS.AES.encrypt(sandi, activeMasterPass).toString()
-            };
-
-            currentLoadedVault.push(newItem);
-            
-            const key = getStorageKey(activeMasterPass);
-            localStorage.setItem(key, CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
+            currentLoadedVault.push({ id: 'id_' + Date.now(), account: akun, ciphertext: CryptoJS.AES.encrypt(sandi, activeMasterPass).toString() });
+            localStorage.setItem(getStorageKey(activeMasterPass), CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
             
             triggerCustomAlert('success', 'Berhasil', 'Data disimpan ke Brankas Anda.');
-            document.getElementById('vNamaAkun').value = '';
-            document.getElementById('vPassword').value = '';
+            document.getElementById('vNamaAkun').value = ''; document.getElementById('vPassword').value = '';
             renderCards();
         }
 
@@ -460,18 +410,15 @@
                         <h4 class="text-white font-semibold text-sm mb-1 truncate">${item.account}</h4>
                         <p class="font-mono text-sm truncate ${isRevealed ? 'text-candyblue' : 'text-gray-500'}">${displayPass}</p>
                     </div>
-
                     <div class="absolute right-12 top-1/2 transform -translate-y-1/2">
                         <button onclick="requestAction('view', '${item.id}')" class="text-gray-500 hover:text-candyblue p-1 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">${eyePath}</svg>
                         </button>
                     </div>
-
                     <div class="absolute right-3 top-3">
                         <button onclick="toggleDropdown(event, '${item.id}')" class="text-gray-500 hover:text-white p-1 rounded transition-colors focus:outline-none">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" /></svg>
                         </button>
-                        
                         <div id="drop-${item.id}" class="hidden absolute right-0 mt-2 w-12 bg-carbon border border-gray-800 rounded-xl shadow-2xl z-20 flex-col overflow-hidden">
                             <button onclick="requestAction('copy', '${item.id}')" class="w-full h-10 flex items-center justify-center text-gray-400 hover:text-candyblue hover:bg-gray-800/50 border-b border-gray-800 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.524 2.25h-3.048a2.25 2.25 0 0 0-2.141 1.638l-.154.515a1.859 1.859 0 0 1-2.43 1.177l-.538-.203a2.25 2.25 0 0 0-2.905 1.258l-1.524 3.68a2.25 2.25 0 0 0 1.21 2.923l.537.203a1.859 1.859 0 0 1 1.177 2.43l-.154.515a2.25 2.25 0 0 0 1.638 2.141m12.446-13.3a2.25 2.25 0 0 1 2.141 1.638l.154.515a1.859 1.859 0 0 0 2.43 1.177l.538-.203a2.25 2.25 0 0 1 2.905 1.258l1.524 3.68a2.25 2.25 0 0 1-1.21 2.923l-.537.203a1.859 1.859 0 0 0-1.177 2.43l.154.515a2.25 2.25 0 0 1-1.638 2.141m-2.25-10.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
@@ -487,72 +434,105 @@
             });
         }
 
-        // --- SISTEM DROPDOWN TITIK TIGA ---
+        // --- SISTEM MODAL & VERIFIKASI ---
         function toggleDropdown(e, id) {
             e.stopPropagation();
-            document.querySelectorAll('[id^="drop-"]').forEach(d => {
-                if(d.id !== 'drop-'+id) d.classList.add('hidden');
-            });
+            document.querySelectorAll('[id^="drop-"]').forEach(d => { if(d.id !== 'drop-'+id) d.classList.add('hidden'); });
             document.getElementById('drop-'+id).classList.toggle('hidden');
         }
-        window.addEventListener('click', () => {
-            document.querySelectorAll('[id^="drop-"]').forEach(d => d.classList.add('hidden'));
-        });
+        window.addEventListener('click', () => { document.querySelectorAll('[id^="drop-"]').forEach(d => d.classList.add('hidden')); });
 
-        // --- VERIFIKASI AKSI SENSITIF (VIEW/COPY/DELETE) ---
         function requestAction(actionType, itemId) {
             document.querySelectorAll('[id^="drop-"]').forEach(d => d.classList.add('hidden'));
 
-            if(actionType === 'view' && revealedItems[itemId]) {
-                delete revealedItems[itemId];
-                renderCards();
-                return;
-            }
+            if(actionType === 'view' && revealedItems[itemId]) { delete revealedItems[itemId]; renderCards(); return; }
+            if(actionType === 'copy' && revealedItems[itemId]) { executeAction('copy', itemId); return; }
 
-            if(actionType === 'copy' && revealedItems[itemId]) {
-                executeAction('copy', itemId);
-                return;
-            }
-
-            pendingAction = actionType;
-            pendingTargetId = itemId;
-
+            pendingAction = actionType; pendingTargetId = itemId;
+            
+            document.getElementById('authModalDesc').innerText = "Masukkan kembali Master Password Anda untuk konfirmasi tindakan.";
             const modal = document.getElementById('authModal');
             const modalBox = document.getElementById('authModalBox');
             
             modal.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => modalBox.classList.remove('scale-95'), 10);
             
-            document.getElementById('authInput').value = "";
-            document.getElementById('authInput').focus();
+            document.getElementById('authInput').value = ""; document.getElementById('authInput').focus();
         }
 
         function closeAuthModal() {
-            const modal = document.getElementById('authModal');
             const modalBox = document.getElementById('authModalBox');
-            
             modalBox.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 200);
+            setTimeout(() => document.getElementById('authModal').classList.add('opacity-0', 'pointer-events-none'), 200);
             pendingAction = null; pendingTargetId = null;
         }
 
         function confirmAuthModal() {
             const inputVal = document.getElementById('authInput').value;
 
-            if(!activeMasterPass || inputVal !== activeMasterPass) {
+            if(!inputVal) {
                 closeAuthModal();
-                setTimeout(() => triggerCustomAlert('error', 'Verifikasi Gagal', 'Master Password yang Anda masukkan salah.'), 250);
+                setTimeout(() => triggerCustomAlert('error', 'Gagal', 'Master Password wajib diisi.'), 250);
                 return;
             }
 
-            const act = pendingAction;
-            const tid = pendingTargetId;
+            // Jika dipanggil dari Generator (Save Cepat)
+            if(pendingAction === 'save_from_gen') {
+                const mp = inputVal;
+                closeAuthModal();
+                setTimeout(() => executeAction('save_from_gen', mp), 250);
+                return;
+            }
+
+            // Jika dipanggil dari dalam Brankas (View/Copy/Delete)
+            if(!activeMasterPass || inputVal !== activeMasterPass) {
+                closeAuthModal();
+                setTimeout(() => triggerCustomAlert('error', 'Verifikasi Gagal', 'Master Password yang dimasukkan salah.'), 250);
+                return;
+            }
+
+            const act = pendingAction; const tid = pendingTargetId;
             closeAuthModal();
             setTimeout(() => executeAction(act, tid), 250);
         }
 
-        function executeAction(actionType, itemId) {
-            const targetItem = currentLoadedVault.find(i => i.id === itemId);
+        function executeAction(actionType, targetIdOrMp) {
+            // Logika Khusus Simpan Cepat
+            if(actionType === 'save_from_gen') {
+                const mp = targetIdOrMp;
+                const akun = document.getElementById('genNamaAkun').value.trim();
+                const sandi = document.getElementById('hasilGenerate').value;
+                
+                const key = getStorageKey(mp);
+                let vaultData = [];
+                const existingData = localStorage.getItem(key);
+                
+                if(existingData) {
+                    try {
+                        const bytes = CryptoJS.AES.decrypt(existingData, mp);
+                        const dec = bytes.toString(CryptoJS.enc.Utf8);
+                        if(dec) vaultData = JSON.parse(dec);
+                    } catch(e) {
+                        return triggerCustomAlert('error', 'Gagal', 'Sandi verifikasi tidak sesuai untuk brankas ini.');
+                    }
+                }
+
+                vaultData.push({ id: 'id_' + Date.now(), account: akun, ciphertext: CryptoJS.AES.encrypt(sandi, mp).toString() });
+                localStorage.setItem(key, CryptoJS.AES.encrypt(JSON.stringify(vaultData), mp).toString());
+                
+                triggerCustomAlert('success', 'Berhasil Disimpan', 'Sandi diamankan langsung ke brankas!');
+                document.getElementById('genNamaAkun').value = '';
+                
+                // Refresh list jika brankas yang sedang terbuka sama dengan tujuan simpan
+                if(activeMasterPass === mp) {
+                    currentLoadedVault = vaultData;
+                    renderCards();
+                }
+                return;
+            }
+
+            // Logika Aksi di Brankas (View/Copy/Delete)
+            const targetItem = currentLoadedVault.find(i => i.id === targetIdOrMp);
             if(!targetItem) return;
 
             let plainPass = "";
@@ -562,53 +542,37 @@
             } catch(e) { return triggerCustomAlert('error', 'Error Sistem', 'Data rusak.'); }
 
             if(actionType === 'view') {
-                revealedItems[itemId] = true;
-                renderCards();
-            } 
-            else if(actionType === 'copy') {
-                navigator.clipboard.writeText(plainPass).then(() => {
-                    triggerCustomAlert('success', 'Disalin', 'Password berhasil disalin.');
-                });
-            } 
-            else if(actionType === 'delete') {
-                currentLoadedVault = currentLoadedVault.filter(i => i.id !== itemId);
-                if(revealedItems[itemId]) delete revealedItems[itemId];
-                
-                const key = getStorageKey(activeMasterPass);
-                localStorage.setItem(key, CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
-                
+                revealedItems[targetIdOrMp] = true; renderCards();
+            } else if(actionType === 'copy') {
+                navigator.clipboard.writeText(plainPass).then(() => triggerCustomAlert('success', 'Disalin', 'Password berhasil disalin.'));
+            } else if(actionType === 'delete') {
+                currentLoadedVault = currentLoadedVault.filter(i => i.id !== targetIdOrMp);
+                if(revealedItems[targetIdOrMp]) delete revealedItems[targetIdOrMp];
+                localStorage.setItem(getStorageKey(activeMasterPass), CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
                 renderCards();
                 triggerCustomAlert('success', 'Dihapus', 'Data telah dihapus dari brankas.');
             }
         }
 
-        // --- MANAJEMEN ANIMASI CUSTOM ALERT ---
         function triggerCustomAlert(status, title, message) {
             const overlay = document.getElementById('premiumAlertOverlay');
             const container = document.getElementById('pIconContainer');
             const svgSuccess = document.getElementById('pSvgSuccess');
             const svgError = document.getElementById('pSvgError');
 
-            container.className = "p-icon-container";
-            svgSuccess.classList.add('hidden');
-            svgError.classList.add('hidden');
+            container.className = "p-icon-container"; svgSuccess.classList.add('hidden'); svgError.classList.add('hidden');
 
             if(status === 'success') {
-                container.classList.add('is-success', 'is-finished');
-                svgSuccess.classList.remove('hidden');
+                container.classList.add('is-success', 'is-finished'); svgSuccess.classList.remove('hidden');
             } else {
-                container.classList.add('is-error', 'is-finished');
-                svgError.classList.remove('hidden');
+                container.classList.add('is-error', 'is-finished'); svgError.classList.remove('hidden');
             }
 
-            document.getElementById('premiumAlertTitle').innerText = title;
-            document.getElementById('premiumAlertMsg').innerText = message;
+            document.getElementById('premiumAlertTitle').innerText = title; document.getElementById('premiumAlertMsg').innerText = message;
             overlay.classList.add('show');
         }
 
-        function closePremiumAlert() {
-            document.getElementById('premiumAlertOverlay').classList.remove('show');
-        }
+        function closePremiumAlert() { document.getElementById('premiumAlertOverlay').classList.remove('show'); }
     </script>
 </body>
 </html>
