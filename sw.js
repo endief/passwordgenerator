@@ -3,8 +3,8 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './https://raw.githubusercontent.com/username/assets/main/secure.png',
-  './https://raw.githubusercontent.com/username/assets/main/secure.png'
+  './src/secure.png',
+  './src/secure.png'
 ];
 
 // Instalasi Service Worker dan menyimpan file ke Cache Cache
