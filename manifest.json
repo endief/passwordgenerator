@@ -9,12 +9,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/username/assets/main/secure.png",
+      "src": "src/secure.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://raw.githubusercontent.com/username/assets/main/secure.png",
+      "src": "src/secure.png",
       "sizes": "512x512",
       "type": "image/png"
     }
