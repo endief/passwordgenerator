@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brankas Sandi Premium</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020202">
+    <link rel="apple-touch-icon" href="logo-192.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -30,14 +35,20 @@
     </script>
     
     <style>
-        body { background-color: #020202; min-height: 100vh; }
+        body {
+            background-color: #020202; 
+            min-height: 100vh;
+        }
+        
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #B2D5E5; }
         input[type="range"] { accent-color: #B2D5E5; }
 
-        /* KODE ANIMASI DARI PENGGUNA */
+        /* ======================================================= */
+        /* ========== KODE ANIMASI DARI PENGGUNA ================= */
+        /* ======================================================= */
         .premium-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(15,23,42,0.4); backdrop-filter: blur(6px);
@@ -45,21 +56,36 @@
             z-index: 9999; opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .premium-overlay.show { opacity: 1; visibility: visible; }
+
         .premium-card {
             background: white; border-radius: 32px; padding: 40px 30px;
             box-shadow: 0 24px 48px rgba(0,0,0,0.15); text-align: center;
-            width: 90%; max-width: 320px; transform: scale(0.9) translateY(15px); transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            width: 90%; max-width: 320px; 
+            transform: scale(0.9) translateY(15px); 
+            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
         .premium-overlay.show .premium-card { transform: scale(1) translateY(0); }
-        .p-icon-container { position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; }
+
+        .p-icon-container {
+            position: relative; width: 80px; height: 80px; margin: 0 auto 20px auto;
+            display: flex; justify-content: center; align-items: center;
+        }
+
         .p-circle {
             position: absolute; width: 64px; height: 64px; border-radius: 50%;
             background: #0F2D5C; top: 50%; left: 50%; margin: -32px 0 0 -32px;
-            transform: scale(0); opacity: 0; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s ease; z-index: 1;
+            transform: scale(0); opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s ease;
+            z-index: 1;
         }
         .is-finished .p-circle { transform: scale(1); opacity: 1; }
+
         .is-success .p-circle { background: #10b981; } 
         .is-error .p-circle { background: #ef4444; }   
+        .is-loading .p-circle { background: #0F2D5C; transform: scale(1); opacity: 1; animation: p-pulse 1.5s infinite; } 
+
+        @keyframes p-pulse { 0% { transform: scale(0.9); } 50% { transform: scale(1); } 100% { transform: scale(0.9); } }
+
         .p-svg {
             position: absolute; width: 32px; height: 32px; top: 50%; left: 50%; margin: -16px 0 0 -16px;
             fill: none; stroke: white; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
@@ -67,6 +93,7 @@
         }
         .is-finished .p-svg { animation: p-draw 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.2s; }
         @keyframes p-draw { to { stroke-dashoffset: 0; } }
+
         .p-ripple {
             position: absolute; width: 64px; height: 64px; border-radius: 50%;
             border: 2px solid transparent; top: 50%; left: 50%; margin: -32px 0 0 -32px;
@@ -75,8 +102,11 @@
         .is-success .p-ripple { border-color: #10b981; animation: p-rip 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
         .is-error .p-ripple { border-color: #ef4444; animation: p-rip 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
         @keyframes p-rip { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
+
         .is-finished .p-icon-container { animation: p-bounce-soft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s; }
         @keyframes p-bounce-soft { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        
+        /* Animasi Transisi View */
         .fade-enter { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -85,14 +115,14 @@
 
     <div class="bg-carbon rounded-[32px] shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[95vh] overflow-y-auto border border-gray-800/50 relative">
         
-        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">Premium Vault</h1>
-        <p class="text-center text-[10px] text-gray-500 mb-6 uppercase tracking-widest">AES-256 Offline Encrypted</p>
+        <img src="https://raw.githubusercontent.com/username/assets/main/secure.png" alt="Logo" class="w-16 h-16 mx-auto mb-3 object-contain drop-shadow-[0_0_15px_rgba(178,213,229,0.3)]">
+        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">Password Generator</h1>
+        <p class="text-center text-[10px] text-gray-500 mb-6 uppercase tracking-widest">Pembuat dan Penyimpanan password</p>
 
         <div class="flex gap-2 mb-6 bg-onyx p-1.5 rounded-full border border-gray-800/50">
             <button onclick="switchTab('generator')" id="tabGenerator" class="w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float">Generator</button>
             <button onclick="switchTab('brankas')" id="tabBrankas" class="w-1/2 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all">Brankas</button>
         </div>
-
 
         <div id="viewGenerator" class="fade-enter block">
             <div class="flex gap-3 mb-6 bg-onyx p-1.5 rounded-full border border-gray-800/50">
@@ -127,7 +157,7 @@
                 <label class="block text-[11px] font-medium mb-3 text-gray-400 pl-2 uppercase tracking-wider">Simpan Cepat ke Brankas</label>
                 <input type="text" id="genNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Gmail)">
                 <button onclick="promptSaveFromGenerator()" class="w-full bg-carbon border border-gray-700 text-white hover:text-candyblue hover:border-candyblue font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm">
-                    Simpan Sandi Ini
+                    Simpan
                 </button>
             </div>
         </div>
@@ -139,7 +169,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
                 </div>
                 <h3 class="text-white font-medium mb-1">Akses Brankas</h3>
-                <p class="text-[10px] text-gray-500 mb-5">Masukkan Master Password untuk membuka atau membuat brankas baru.</p>
+                <p class="text-[10px] text-gray-500 mb-5">Masukkan Master Password</p>
                 <input type="password" id="loginMasterPass" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3.5 text-white text-sm text-center focus:outline-none focus:border-candyblue transition-colors mb-4" placeholder="Kunci Rahasia Utama...">
                 <button onclick="prosesLoginBrankas()" class="w-full bg-candyblue text-onyx font-semibold py-3.5 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transform hover:-translate-y-1 transition-all duration-300">
                     Buka Brankas
@@ -157,19 +187,19 @@
             </div>
 
             <div class="mb-6 p-4 bg-onyx rounded-3xl border border-gray-800/50">
-                <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Tambah Data Baru</label>
+                <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Tambah Password Baru</label>
                 <input type="text" id="vNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Gmail)">
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="vPassword" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm font-mono focus:outline-none focus:border-candyblue transition-colors" placeholder="Password / PIN">
                     <button onclick="uiGenerateQuick()" class="bg-carbon border border-gray-800 hover:border-candyblue hover:text-candyblue text-gray-400 px-4 rounded-full text-xs font-semibold transition-all">Acak</button>
                 </div>
                 <button onclick="uiSimpanKeBrankas()" class="w-full bg-candyblue text-onyx font-semibold py-3 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transition-all">
-                    Simpan Data
+                    Simpan
                 </button>
             </div>
 
             <hr class="border-gray-800 my-6">
-            <div class="mb-3 px-1"><h4 class="text-xs font-medium text-gray-400">Data Tersimpan</h4></div>
+            <div class="mb-3 px-1"><h4 class="text-xs font-medium text-gray-400">Password Tersimpan</h4></div>
             <div id="passwordContainer" class="space-y-3 pb-4"></div>
         </div>
 
@@ -177,14 +207,14 @@
 
     <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
         <div class="bg-carbon border border-gray-800 rounded-3xl p-6 w-[90%] max-w-sm text-center shadow-2xl transform scale-95 transition-transform duration-300" id="authModalBox">
-            <h3 class="text-base font-semibold text-white mb-2">Keamanan Berlapis</h3>
-            <p id="authModalDesc" class="text-[11px] text-gray-400 mb-5">Masukkan kembali Master Password Anda untuk konfirmasi tindakan.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Master Password</h3>
+            <p id="authModalDesc" class="text-[11px] text-gray-400 mb-5">Untuk konfirmasi masukkan Master Password Anda</p>
             
             <input type="password" id="authInput" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm text-center focus:outline-none focus:border-candyblue mb-5" placeholder="Master Password...">
             
             <div class="flex gap-3">
                 <button onclick="closeAuthModal()" class="w-1/2 bg-transparent border border-gray-700 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all">Batal</button>
-                <button onclick="confirmAuthModal()" class="w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float">Lanjut</button>
+                <button onclick="confirmAuthModal()" class="w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float">Konfirmasi</button>
             </div>
         </div>
     </div>
@@ -299,7 +329,6 @@
             navigator.clipboard.writeText(val).then(() => triggerCustomAlert('success', 'Tersalin', 'Sandi disalin ke clipboard!'));
         }
 
-        // --- FITUR BARU: SIMPAN CEPAT DARI GENERATOR ---
         function promptSaveFromGenerator() {
             const akun = document.getElementById('genNamaAkun').value.trim();
             const sandi = document.getElementById('hasilGenerate').value;
@@ -476,7 +505,6 @@
                 return;
             }
 
-            // Jika dipanggil dari Generator (Save Cepat)
             if(pendingAction === 'save_from_gen') {
                 const mp = inputVal;
                 closeAuthModal();
@@ -484,7 +512,6 @@
                 return;
             }
 
-            // Jika dipanggil dari dalam Brankas (View/Copy/Delete)
             if(!activeMasterPass || inputVal !== activeMasterPass) {
                 closeAuthModal();
                 setTimeout(() => triggerCustomAlert('error', 'Verifikasi Gagal', 'Master Password yang dimasukkan salah.'), 250);
@@ -497,7 +524,6 @@
         }
 
         function executeAction(actionType, targetIdOrMp) {
-            // Logika Khusus Simpan Cepat
             if(actionType === 'save_from_gen') {
                 const mp = targetIdOrMp;
                 const akun = document.getElementById('genNamaAkun').value.trim();
@@ -523,7 +549,6 @@
                 triggerCustomAlert('success', 'Berhasil Disimpan', 'Sandi diamankan langsung ke brankas!');
                 document.getElementById('genNamaAkun').value = '';
                 
-                // Refresh list jika brankas yang sedang terbuka sama dengan tujuan simpan
                 if(activeMasterPass === mp) {
                     currentLoadedVault = vaultData;
                     renderCards();
@@ -531,7 +556,6 @@
                 return;
             }
 
-            // Logika Aksi di Brankas (View/Copy/Delete)
             const targetItem = currentLoadedVault.find(i => i.id === targetIdOrMp);
             if(!targetItem) return;
 
@@ -550,7 +574,7 @@
                 if(revealedItems[targetIdOrMp]) delete revealedItems[targetIdOrMp];
                 localStorage.setItem(getStorageKey(activeMasterPass), CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
                 renderCards();
-                triggerCustomAlert('success', 'Dihapus', 'Data telah dihapus dari brankas.');
+                triggerCustomAlert('success', 'Dihapus', 'Password telah dihapus.');
             }
         }
 
@@ -573,6 +597,20 @@
         }
 
         function closePremiumAlert() { document.getElementById('premiumAlertOverlay').classList.remove('show'); }
+    </script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('Service Worker berhasil didaftarkan dengan scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('Service Worker gagal didaftarkan: ', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
