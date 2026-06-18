@@ -9,6 +9,10 @@
     <meta name="theme-color" content="#020202">
     <link rel="apple-touch-icon" href="src/secure.png">
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -42,7 +46,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #B2D5E5; }
         input[type="range"] { accent-color: #B2D5E5; }
 
-        /* KODE ANIMASI DARI PENGGUNA */
+        /* KODE ANIMASI CUSTOM */
         .premium-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(15,23,42,0.4); backdrop-filter: blur(6px);
@@ -87,7 +91,6 @@
         .is-finished .p-icon-container { animation: p-bounce-soft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s; }
         @keyframes p-bounce-soft { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
         
-        /* Animasi Transisi View */
         .fade-enter { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -96,20 +99,21 @@
 
     <div id="viewAppLock" class="fixed inset-0 bg-onyx flex flex-col items-center justify-center z-[100] hidden">
         <img src="src/secure.png" alt="Logo" class="w-32 h-32 mb-6 object-contain drop-shadow-[0_0_20px_rgba(178,213,229,0.2)]">
-        <h2 class="text-2xl font-bold text-white mb-2">Aplikasi Terkunci</h2>
-        <p class="text-xs text-gray-500 mb-8 px-8 text-center">Gunakan biometrik pada perangkat Anda.</p>
+        <h2 class="text-2xl font-bold text-white mb-2">Brankas Terkunci</h2>
+        <p class="text-xs text-gray-500 mb-8 px-8 text-center">Gunakan sidik jari untuk login & membuka dekripsi brankas cloud Anda.</p>
         
-        <button onclick="unlockAppBiometric()" class="bg-candyblue text-onyx font-bold py-4 px-10 rounded-full shadow-premium-float hover:shadow-premium-hover transition-all flex items-center gap-3">
+        <button onclick="unlockAppBiometric()" id="btnFingerprint" class="bg-candyblue text-onyx font-bold py-4 px-10 rounded-full shadow-premium-float hover:shadow-premium-hover transition-all flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" /></svg>
             Buka Kunci
         </button>
+        <button onclick="matikanBiometrik()" class="mt-6 text-xs text-gray-500 hover:text-white transition">Masuk Manual dengan Password</button>
     </div>
 
     <div id="mainContainer" class="bg-carbon rounded-[32px] shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[95vh] overflow-y-auto border border-gray-800/50 relative hidden">
         
-        <img src="src/secure.png" alt="Logo" class="w-32 h-32 mx-auto mb-3 object-contain drop-shadow-[0_0_15px_rgba(178,213,229,0.3)]">
-        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">Password Generator</h1>
-        <p class="text-center text-[10px] text-gray-500 mb-6 uppercase tracking-widest">Pembuat & Penyimpanan Password</p>
+        <img src="src/secure.png" alt="Logo" class="w-24 h-24 mx-auto mb-3 object-contain drop-shadow-[0_0_15px_rgba(178,213,229,0.3)]">
+        <h1 class="text-2xl font-semibold text-center mb-1 text-white tracking-wide">Premium Vault</h1>
+        <p class="text-center text-[10px] text-gray-500 mb-6 uppercase tracking-widest">Cloud Synced & AES-256 Encrypted</p>
 
         <div class="flex gap-2 mb-6 bg-onyx p-1.5 rounded-full border border-gray-800/50">
             <button onclick="switchTab('generator')" id="tabGenerator" class="w-1/2 bg-candyblue text-onyx font-semibold py-2.5 rounded-full text-sm transition-all shadow-premium-float">Generator</button>
@@ -146,10 +150,10 @@
             </div>
 
             <div class="mt-6 p-4 bg-onyx rounded-3xl border border-gray-800/50">
-                <label class="block text-[11px] font-medium mb-3 text-gray-400 pl-2 uppercase tracking-wider">Simpan</label>
+                <label class="block text-[11px] font-medium mb-3 text-gray-400 pl-2 uppercase tracking-wider">Simpan ke Cloud</label>
                 <input type="text" id="genNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Gmail)">
                 <button onclick="promptSaveFromGenerator()" class="w-full bg-carbon border border-gray-700 text-white hover:text-candyblue hover:border-candyblue font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm">
-                    Simpan
+                    Simpan Sandi Ini
                 </button>
             </div>
         </div>
@@ -157,43 +161,40 @@
         <div id="viewVaultLogin" class="hidden fade-enter">
             <div class="mb-6 bg-onyx rounded-3xl p-6 border border-gray-800/50 text-center">
                 <div class="w-12 h-12 rounded-full bg-carbon border border-gray-700 flex items-center justify-center mx-auto mb-4 text-candyblue">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 0 0 4.5 4.5H18a3.75 3.75 0 0 0 1.332-7.257 3 3 0 0 0-3.758-3.848 5.25 5.25 0 0 0-10.233 2.33A4.502 4.502 0 0 0 2.25 15Z" /></svg>
                 </div>
-                <h3 class="text-white font-medium mb-1">Akses Brankas</h3>
-                <p class="text-[10px] text-gray-500 mb-5">Gunakan Master Password atau Biometrik</p>
+                <h3 class="text-white font-medium mb-1">Akses Brankas Cloud</h3>
+                <p class="text-[10px] text-gray-500 mb-5">Master Password akan digunakan sebagai kata sandi ganda (Login Server & Kunci Enkripsi).</p>
                 
-                <div class="flex gap-2 mb-4">
-                    <input type="password" id="loginMasterPass" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3.5 text-white text-sm focus:outline-none focus:border-candyblue transition-colors" placeholder="Kunci Rahasia Utama...">
-                    <button onclick="loginBrankasBiometrik()" id="btnBioLogin" class="bg-carbon border border-gray-800 hover:border-candyblue hover:text-candyblue text-gray-400 p-3.5 rounded-full transition-all duration-300 hidden" title="Gunakan Biometrik">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33" /></svg>
-                    </button>
+                <input type="email" id="loginEmail" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3.5 text-white text-sm text-center focus:outline-none focus:border-candyblue transition-colors mb-3" placeholder="Alamat Email...">
+                <input type="password" id="loginMasterPass" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-3.5 text-white text-sm text-center focus:outline-none focus:border-candyblue transition-colors mb-5" placeholder="Master Password...">
+                
+                <div class="flex gap-2">
+                    <button onclick="prosesMasukFirebase()" id="btnMasuk" class="w-1/2 bg-candyblue text-onyx font-semibold py-3.5 rounded-full shadow-premium-float hover:shadow-premium-hover transition-all duration-300">Masuk</button>
+                    <button onclick="prosesDaftarFirebase()" id="btnDaftar" class="w-1/2 bg-carbon text-gray-300 border border-gray-700 hover:text-white font-semibold py-3.5 rounded-full transition-all duration-300">Daftar Baru</button>
                 </div>
-                
-                <button onclick="prosesLoginBrankas()" class="w-full bg-candyblue text-onyx font-semibold py-3.5 px-4 rounded-full shadow-premium-float hover:shadow-premium-hover transform hover:-translate-y-1 transition-all duration-300">
-                    Buka Brankas
-                </button>
             </div>
         </div>
 
         <div id="viewVaultDash" class="hidden fade-enter">
             <div class="flex justify-between items-center mb-5 px-1">
                 <span class="text-xs font-semibold text-candyblue uppercase tracking-widest flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-candyblue animate-pulse"></span> Brankas Terbuka
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Cloud Aktif
                 </span>
-                <button onclick="prosesKunciBrankas()" class="text-[10px] text-red-400 border border-red-900/40 hover:bg-red-950/30 px-3 py-1.5 rounded-full transition-colors">Kunci Ulang</button>
+                <button onclick="prosesKeluarFirebase()" class="text-[10px] text-red-400 border border-red-900/40 hover:bg-red-950/30 px-3 py-1.5 rounded-full transition-colors">Keluar Akun</button>
             </div>
 
             <div id="bioSetupBanner" class="mb-5 bg-carbon border border-candyblue/30 rounded-2xl p-4 flex items-center justify-between shadow-lg hidden">
                 <div class="flex-1 pr-3">
                     <h4 class="text-xs font-semibold text-white mb-1">Akses Cepat Biometrik</h4>
-                    <p class="text-[10px] text-gray-400 leading-tight">Gunakan sidik jari untuk mengunci aplikasi dan mengakses brankas tanpa Master Password.</p>
+                    <p class="text-[10px] text-gray-400 leading-tight">Gunakan sidik jari untuk mengunci aplikasi dan login otomatis.</p>
                 </div>
                 <button onclick="setupBiometric()" class="bg-candyblue text-onyx text-[10px] font-bold px-4 py-2 rounded-full hover:bg-white transition-colors">Aktifkan</button>
             </div>
 
             <div class="mb-6 p-4 bg-onyx rounded-3xl border border-gray-800/50">
-                <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Tambah Password Baru</label>
-                <input type="text" id="vNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Gmail)">
+                <label class="block text-xs font-medium mb-3 text-gray-400 pl-2">Tambah Data Cloud</label>
+                <input type="text" id="vNamaAkun" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm focus:outline-none focus:border-candyblue mb-3 transition-colors" placeholder="Nama Akun (Misal: Facebook)">
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="vPassword" class="w-full bg-carbon border border-gray-800 rounded-full px-5 py-2.5 text-white text-sm font-mono focus:outline-none focus:border-candyblue transition-colors" placeholder="Password / PIN">
                     <button onclick="uiGenerateQuick()" class="bg-carbon border border-gray-800 hover:border-candyblue hover:text-candyblue text-gray-400 px-4 rounded-full text-xs font-semibold transition-all">Acak</button>
@@ -204,7 +205,7 @@
             </div>
 
             <hr class="border-gray-800 my-6">
-            <div class="mb-3 px-1"><h4 class="text-xs font-medium text-gray-400">Password Tersimpan</h4></div>
+            <div class="mb-3 px-1"><h4 class="text-xs font-medium text-gray-400">Tersinkronisasi</h4></div>
             <div id="passwordContainer" class="space-y-3 pb-4"></div>
         </div>
 
@@ -212,8 +213,8 @@
 
     <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
         <div class="bg-carbon border border-gray-800 rounded-3xl p-6 w-[90%] max-w-sm text-center shadow-2xl transform scale-95 transition-transform duration-300" id="authModalBox">
-            <h3 class="text-base font-semibold text-white mb-2">Master Password</h3>
-            <p id="authModalDesc" class="text-[11px] text-gray-400 mb-5">Untuk konfirmasi masukkan Master Password Anda</p>
+            <h3 class="text-base font-semibold text-white mb-2">Keamanan Dekripsi</h3>
+            <p id="authModalDesc" class="text-[11px] text-gray-400 mb-5">Untuk konfirmasi, masukkan Master Password Anda.</p>
             <input type="password" id="authInput" class="w-full bg-onyx border border-gray-800 rounded-full px-5 py-3 text-white text-sm text-center focus:outline-none focus:border-candyblue mb-5" placeholder="Master Password...">
             <div class="flex gap-3">
                 <button onclick="closeAuthModal()" class="w-1/2 bg-transparent border border-gray-700 text-gray-400 hover:text-white font-medium py-2.5 rounded-full text-sm transition-all">Batal</button>
@@ -237,6 +238,21 @@
     </div>
 
     <script>
+        // ==========================================
+        // INISIALISASI FIREBASE
+        // ==========================================
+        const firebaseConfig = {
+          apiKey: "AIzaSyCEsoxlGHHyHUXCBWfEn9-m4TyviifLDFU",
+          authDomain: "brankaspassword.firebaseapp.com",
+          projectId: "brankaspassword",
+          storageBucket: "brankaspassword.firebasestorage.app",
+          messagingSenderId: "1033987845758",
+          appId: "1:1033987845758:web:c3a91c10efd41a91e9322f"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         // --- STATE & VARIABEL ---
         let currentTab = 'generator'; 
         let activeMasterPass = null; 
@@ -245,43 +261,155 @@
         let pendingAction = null; 
         let pendingTargetId = null;
 
-        // Inisialisasi UI
-        setMode('sandi');
-
-        // --- SISTEM BIOMETRIK (WEBAUTHN) ---
-        // Peringatan Keamanan: Ini menyimpan Master Password di localStorage agar biometrik bisa membukanya.
-        
+        // ==========================================
+        // SIKLUS HIDUP APLIKASI (APP START)
+        // ==========================================
         window.onload = function() {
+            setMode('sandi');
+            
+            // Cek apakah mode biometrik aktif di HP ini
             const hasBiometric = localStorage.getItem('pv_bio_enabled');
             if (hasBiometric === 'true') {
                 document.getElementById('viewAppLock').classList.remove('hidden');
-                document.getElementById('mainContainer').classList.add('hidden');
-                document.getElementById('btnBioLogin').classList.remove('hidden');
             } else {
-                document.getElementById('viewAppLock').classList.add('hidden');
                 document.getElementById('mainContainer').classList.remove('hidden');
+                
+                // Jika aplikasi direload tapi biometrik mati, kita paksa user Logout
+                // Karena kita kehilangan Master Password dari RAM, kita tidak bisa mendekripsi data!
+                auth.onAuthStateChanged(user => {
+                    if (user && !activeMasterPass) {
+                        auth.signOut();
+                    }
+                });
             }
         };
 
-        // Fungsi Bantuan Konversi WebAuthn
-        function bufferToBase64(buf) {
-            const bin = String.fromCharCode.apply(null, new Uint8Array(buf));
-            return window.btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        // ==========================================
+        // LOGIKA FIREBASE CLOUD & ZERO KNOWLEDGE
+        // ==========================================
+        function prosesMasukFirebase() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const mp = document.getElementById('loginMasterPass').value;
+            
+            if(!email || !mp) return triggerCustomAlert('error', 'Gagal', 'Email dan Master Password wajib diisi.');
+            tampilkanLoadingLogin(true);
+
+            auth.signInWithEmailAndPassword(email, mp).then((userCredential) => {
+                activeMasterPass = mp; // Simpan di RAM sebagai kunci dekripsi
+                tarikDataDariCloud(userCredential.user.uid);
+            }).catch(error => {
+                tampilkanLoadingLogin(false);
+                let pesan = 'Terjadi kesalahan sistem.';
+                if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') pesan = 'Email atau Master Password salah!';
+                if(error.code === 'auth/network-request-failed') pesan = 'Koneksi internet terputus.';
+                triggerCustomAlert('error', 'Akses Ditolak', pesan);
+            });
         }
 
+        function prosesDaftarFirebase() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const mp = document.getElementById('loginMasterPass').value;
+            
+            if(!email || !mp) return triggerCustomAlert('error', 'Gagal', 'Email dan Master Password wajib diisi.');
+            if(mp.length < 6) return triggerCustomAlert('error', 'Sandi Terlalu Pendek', 'Master Password minimal 6 karakter.');
+            
+            tampilkanLoadingLogin(true);
+
+            auth.createUserWithEmailAndPassword(email, mp).then((userCredential) => {
+                activeMasterPass = mp;
+                currentLoadedVault = [];
+                // Buat brankas kosong di database
+                simpanDataKeCloud(userCredential.user.uid).then(() => {
+                    tampilkanLoadingLogin(false);
+                    triggerCustomAlert('success', 'Akun Dibuat', 'Brankas Cloud Anda siap digunakan.');
+                    switchTab('brankas');
+                    renderCards();
+                });
+            }).catch(error => {
+                tampilkanLoadingLogin(false);
+                let pesan = error.message;
+                if(error.code === 'auth/email-already-in-use') pesan = 'Email ini sudah terdaftar.';
+                triggerCustomAlert('error', 'Gagal Mendaftar', pesan);
+            });
+        }
+
+        function prosesKeluarFirebase() {
+            auth.signOut().then(() => {
+                activeMasterPass = null;
+                currentLoadedVault = [];
+                revealedItems = {};
+                switchTab('brankas'); // Ini akan memicu form login untuk muncul
+            });
+        }
+
+        // FUNGSI INTI ZERO-KNOWLEDGE (Tarik & Simpan)
+        function tarikDataDariCloud(uid) {
+            db.collection('vaults').doc(uid).get().then((doc) => {
+                if (doc.exists && doc.data().encryptedData) {
+                    try {
+                        const bytes = CryptoJS.AES.decrypt(doc.data().encryptedData, activeMasterPass);
+                        const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
+                        if (!decryptedString) throw new Error();
+                        currentLoadedVault = JSON.parse(decryptedString);
+                    } catch(e) {
+                        tampilkanLoadingLogin(false);
+                        return triggerCustomAlert('error', 'Dekripsi Gagal', 'Data rusak atau Master Password tidak cocok.');
+                    }
+                } else {
+                    currentLoadedVault = []; // Brankas baru/kosong
+                }
+                
+                tampilkanLoadingLogin(false);
+                document.getElementById('loginMasterPass').value = "";
+                switchTab('brankas');
+                
+                // Tampilkan banner setup bio jika belum aktif
+                if (localStorage.getItem('pv_bio_enabled') !== 'true') {
+                    document.getElementById('bioSetupBanner').classList.remove('hidden');
+                }
+                
+                renderCards();
+            }).catch(err => {
+                tampilkanLoadingLogin(false);
+                triggerCustomAlert('error', 'Error Jaringan', 'Gagal menarik data dari server.');
+            });
+        }
+
+        function simpanDataKeCloud(uid) {
+            // ENKRIPSI SELURUH ARRAY DATA SEBELUM DIKIRIM KE FIREBASE
+            const encData = CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString();
+            return db.collection('vaults').doc(uid).set({
+                encryptedData: encData,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        function tampilkanLoadingLogin(isLoading) {
+            const btnM = document.getElementById('btnMasuk');
+            const btnD = document.getElementById('btnDaftar');
+            if(isLoading) {
+                btnM.innerText = "Memproses..."; btnM.disabled = true;
+                btnD.disabled = true;
+            } else {
+                btnM.innerText = "Masuk"; btnM.disabled = false;
+                btnD.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // SISTEM BIOMETRIK (PASSKEY LOKAL)
+        // ==========================================
         async function setupBiometric() {
-            if (!window.PublicKeyCredential) return triggerCustomAlert('error', 'Gagal', 'Browser Anda tidak mendukung biometrik WebAuthn.');
-            if (!activeMasterPass) return triggerCustomAlert('error', 'Gagal', 'Anda harus membuka brankas terlebih dahulu.');
+            if (!window.PublicKeyCredential) return triggerCustomAlert('error', 'Gagal', 'Perangkat tidak mendukung biometrik WebAuthn.');
+            if (!activeMasterPass || !auth.currentUser) return triggerCustomAlert('error', 'Gagal', 'Anda harus masuk ke brankas terlebih dahulu.');
 
             try {
                 const challenge = window.crypto.getRandomValues(new Uint8Array(32));
                 const userId = window.crypto.getRandomValues(new Uint8Array(16));
                 
-                // Mendaftarkan Passkey Lokal
                 const credential = await navigator.credentials.create({
                     publicKey: {
-                        challenge: challenge,
-                        rp: { name: "Premium Vault" },
+                        challenge: challenge, rp: { name: "Premium Vault" },
                         user: { id: userId, name: "owner", displayName: "Pemilik Brankas" },
                         pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
                         authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "required" },
@@ -290,26 +418,25 @@
                 });
 
                 if (credential) {
-                    // Simpan status dan enkripsi statis Master Password ke LocalStorage
                     localStorage.setItem('pv_bio_enabled', 'true');
-                    
-                    // (CATATAN: Enkripsi ini menggunakan kunci statis hanya untuk mencegah password terbaca langsung oleh mata biasa.
-                    // Secara kriptografi ini BUKAN keamanan mutlak, melainkan kompromi untuk kenyamanan biometrik lokal).
+                    localStorage.setItem('pv_bio_email', auth.currentUser.email);
+                    // Obscure MP locally
                     const obscuredMp = CryptoJS.AES.encrypt(activeMasterPass, "static_local_key_123").toString();
                     localStorage.setItem('pv_bio_mp', obscuredMp);
 
                     document.getElementById('bioSetupBanner').classList.add('hidden');
-                    document.getElementById('btnBioLogin').classList.remove('hidden');
-                    triggerCustomAlert('success', 'Biometrik Aktif', 'App Lock dan Akses Cepat Brankas diaktifkan.');
+                    triggerCustomAlert('success', 'Biometrik Aktif', 'Kini Anda bisa login dan membuka brankas dengan sidik jari.');
                 }
             } catch (err) {
-                console.error(err);
                 triggerCustomAlert('error', 'Dibatalkan', 'Pendaftaran biometrik gagal atau dibatalkan.');
             }
         }
 
         async function unlockAppBiometric() {
             if (!window.PublicKeyCredential) return;
+            const btn = document.getElementById('btnFingerprint');
+            btn.innerHTML = "Memverifikasi...";
+            
             try {
                 const challenge = window.crypto.getRandomValues(new Uint8Array(32));
                 const assertion = await navigator.credentials.get({
@@ -317,39 +444,42 @@
                 });
 
                 if (assertion) {
-                    document.getElementById('viewAppLock').classList.add('hidden');
-                    document.getElementById('mainContainer').classList.remove('hidden');
+                    const email = localStorage.getItem('pv_bio_email');
+                    const obscuredMp = localStorage.getItem('pv_bio_mp');
+                    
+                    if(email && obscuredMp) {
+                        const bytes = CryptoJS.AES.decrypt(obscuredMp, "static_local_key_123");
+                        const originalMp = bytes.toString(CryptoJS.enc.Utf8);
+                        
+                        document.getElementById('viewAppLock').classList.add('hidden');
+                        document.getElementById('mainContainer').classList.remove('hidden');
+                        
+                        // Auto Login Firebase
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('loginMasterPass').value = originalMp;
+                        prosesMasukFirebase();
+                    } else {
+                        matikanBiometrik();
+                    }
                 }
             } catch (err) {
+                btn.innerHTML = `Buka Kunci`;
                 triggerCustomAlert('error', 'Akses Ditolak', 'Verifikasi biometrik gagal.');
             }
         }
 
-        async function loginBrankasBiometrik() {
-            if (!window.PublicKeyCredential) return;
-            try {
-                const challenge = window.crypto.getRandomValues(new Uint8Array(32));
-                const assertion = await navigator.credentials.get({
-                    publicKey: { challenge: challenge, userVerification: "required", timeout: 60000 }
-                });
-
-                if (assertion) {
-                    // Ambil Master Password yang disembunyikan
-                    const obscuredMp = localStorage.getItem('pv_bio_mp');
-                    if (obscuredMp) {
-                        const bytes = CryptoJS.AES.decrypt(obscuredMp, "static_local_key_123");
-                        const originalMp = bytes.toString(CryptoJS.enc.Utf8);
-                        
-                        document.getElementById('loginMasterPass').value = originalMp;
-                        prosesLoginBrankas(); // Lanjut login otomatis
-                    }
-                }
-            } catch (err) {
-                triggerCustomAlert('error', 'Akses Ditolak', 'Gagal memverifikasi sidik jari.');
-            }
+        function matikanBiometrik() {
+            localStorage.removeItem('pv_bio_enabled');
+            localStorage.removeItem('pv_bio_email');
+            localStorage.removeItem('pv_bio_mp');
+            document.getElementById('viewAppLock').classList.add('hidden');
+            document.getElementById('mainContainer').classList.remove('hidden');
+            auth.signOut();
         }
 
-        // --- SISTEM NAVIGASI ---
+        // ==========================================
+        // LOGIKA ANTARMUKA & BRANKAS LOKAL
+        // ==========================================
         function switchTab(tab) {
             currentTab = tab;
             const btnGen = document.getElementById('tabGenerator');
@@ -367,12 +497,8 @@
                 btnGen.className = activeClass; btnVault.className = inactiveClass; viewGen.classList.remove('hidden');
             } else {
                 btnGen.className = inactiveClass; btnVault.className = activeClass;
-                if(activeMasterPass) {
+                if(auth.currentUser && activeMasterPass) {
                     viewDash.classList.remove('hidden');
-                    // Tampilkan banner setup bio jika belum aktif
-                    if (localStorage.getItem('pv_bio_enabled') !== 'true') {
-                        document.getElementById('bioSetupBanner').classList.remove('hidden');
-                    }
                 } else {
                     viewLogin.classList.remove('hidden');
                 }
@@ -413,7 +539,6 @@
                 if(document.getElementById('chkNum').checked) chars += "0123456789";
                 if(document.getElementById('chkSym').checked) chars += "!@#$%^&*?";
                 if(chars === "") return "Pilih minimal 1 opsi!";
-                
                 let pass = ""; const rv = new Uint32Array(length); window.crypto.getRandomValues(rv);
                 for (let i = 0; i < length; i++) pass += chars[rv[i] % chars.length];
                 return pass;
@@ -433,6 +558,9 @@
         }
 
         function promptSaveFromGenerator() {
+            if(!auth.currentUser || !activeMasterPass) {
+                return triggerCustomAlert('error', 'Gagal', 'Anda harus masuk ke Brankas Cloud terlebih dahulu.');
+            }
             const akun = document.getElementById('genNamaAkun').value.trim();
             const sandi = document.getElementById('hasilGenerate').value;
 
@@ -440,7 +568,7 @@
             if(!akun) return triggerCustomAlert('error', 'Gagal', 'Nama akun wajib diisi.');
 
             pendingAction = 'save_from_gen'; pendingTargetId = null;
-            document.getElementById('authModalDesc').innerText = "Masukkan Master Password ke mana sandi ini akan disimpan.";
+            document.getElementById('authModalDesc').innerText = "Masukkan Master Password untuk memverifikasi enkripsi ke Cloud.";
             
             const modal = document.getElementById('authModal');
             const modalBox = document.getElementById('authModalBox');
@@ -448,50 +576,6 @@
             setTimeout(() => modalBox.classList.remove('scale-95'), 10);
             
             document.getElementById('authInput').value = ""; document.getElementById('authInput').focus();
-        }
-
-        // --- BRANKAS LOGIC ---
-        function getStorageKey(mp) { return "vlt_" + CryptoJS.SHA256(mp).toString(); }
-
-        function prosesLoginBrankas() {
-            const mp = document.getElementById('loginMasterPass').value;
-            if(!mp) return triggerCustomAlert('error', 'Akses Ditolak', 'Master Password wajib diisi.');
-
-            const key = getStorageKey(mp);
-            const dataEnc = localStorage.getItem(key);
-
-            if(dataEnc) {
-                try {
-                    const bytes = CryptoJS.AES.decrypt(dataEnc, mp);
-                    const dec = bytes.toString(CryptoJS.enc.Utf8);
-                    if(!dec) throw new Error();
-                    currentLoadedVault = JSON.parse(dec);
-                } catch(e) { return triggerCustomAlert('error', 'Akses Ditolak', 'Master Password salah.'); }
-            } else {
-                currentLoadedVault = []; 
-            }
-
-            activeMasterPass = mp;
-            revealedItems = {};
-            document.getElementById('loginMasterPass').value = "";
-            
-            document.getElementById('viewVaultLogin').classList.add('hidden');
-            document.getElementById('viewVaultDash').classList.remove('hidden');
-            
-            // Cek apakah bio belum aktif, tampilkan banner
-            if (localStorage.getItem('pv_bio_enabled') !== 'true') {
-                document.getElementById('bioSetupBanner').classList.remove('hidden');
-            } else {
-                document.getElementById('bioSetupBanner').classList.add('hidden');
-            }
-
-            renderCards();
-        }
-
-        function prosesKunciBrankas() {
-            activeMasterPass = null; currentLoadedVault = []; revealedItems = {};
-            document.getElementById('viewVaultDash').classList.add('hidden');
-            document.getElementById('viewVaultLogin').classList.remove('hidden');
         }
 
         function uiGenerateQuick() {
@@ -507,11 +591,13 @@
             if(!akun || !sandi) return triggerCustomAlert('error', 'Gagal', 'Nama Akun dan Password wajib diisi.');
 
             currentLoadedVault.push({ id: 'id_' + Date.now(), account: akun, ciphertext: CryptoJS.AES.encrypt(sandi, activeMasterPass).toString() });
-            localStorage.setItem(getStorageKey(activeMasterPass), CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
             
-            triggerCustomAlert('success', 'Berhasil', 'Data disimpan ke Brankas Anda.');
-            document.getElementById('vNamaAkun').value = ''; document.getElementById('vPassword').value = '';
-            renderCards();
+            // Simpan Ke Firebase
+            simpanDataKeCloud(auth.currentUser.uid).then(() => {
+                triggerCustomAlert('success', 'Berhasil', 'Data disinkronkan ke Brankas Cloud Anda.');
+                document.getElementById('vNamaAkun').value = ''; document.getElementById('vPassword').value = '';
+                renderCards();
+            }).catch(e => triggerCustomAlert('error', 'Error Jaringan', 'Gagal menyinkronkan data ke Cloud.'));
         }
 
         function renderCards() {
@@ -519,7 +605,7 @@
             container.innerHTML = "";
 
             if(currentLoadedVault.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-gray-600 py-6 bg-onyx rounded-2xl border border-gray-800">Brankas Anda masih kosong.</p>`;
+                container.innerHTML = `<p class="text-center text-xs text-gray-600 py-6 bg-onyx rounded-2xl border border-gray-800">Brankas Cloud Anda masih kosong.</p>`;
                 return;
             }
 
@@ -612,13 +698,6 @@
                 return;
             }
 
-            if(pendingAction === 'save_from_gen') {
-                const mp = inputVal;
-                closeAuthModal();
-                setTimeout(() => executeAction('save_from_gen', mp), 250);
-                return;
-            }
-
             if(!activeMasterPass || inputVal !== activeMasterPass) {
                 closeAuthModal();
                 setTimeout(() => triggerCustomAlert('error', 'Verifikasi Gagal', 'Master Password yang dimasukkan salah.'), 250);
@@ -630,40 +709,22 @@
             setTimeout(() => executeAction(act, tid), 250);
         }
 
-        function executeAction(actionType, targetIdOrMp) {
+        function executeAction(actionType, targetId) {
             if(actionType === 'save_from_gen') {
-                const mp = targetIdOrMp;
                 const akun = document.getElementById('genNamaAkun').value.trim();
                 const sandi = document.getElementById('hasilGenerate').value;
                 
-                const key = getStorageKey(mp);
-                let vaultData = [];
-                const existingData = localStorage.getItem(key);
+                currentLoadedVault.push({ id: 'id_' + Date.now(), account: akun, ciphertext: CryptoJS.AES.encrypt(sandi, activeMasterPass).toString() });
                 
-                if(existingData) {
-                    try {
-                        const bytes = CryptoJS.AES.decrypt(existingData, mp);
-                        const dec = bytes.toString(CryptoJS.enc.Utf8);
-                        if(dec) vaultData = JSON.parse(dec);
-                    } catch(e) {
-                        return triggerCustomAlert('error', 'Gagal', 'Sandi verifikasi tidak sesuai untuk brankas ini.');
-                    }
-                }
-
-                vaultData.push({ id: 'id_' + Date.now(), account: akun, ciphertext: CryptoJS.AES.encrypt(sandi, mp).toString() });
-                localStorage.setItem(key, CryptoJS.AES.encrypt(JSON.stringify(vaultData), mp).toString());
-                
-                triggerCustomAlert('success', 'Berhasil Disimpan', 'Sandi diamankan langsung ke brankas!');
-                document.getElementById('genNamaAkun').value = '';
-                
-                if(activeMasterPass === mp) {
-                    currentLoadedVault = vaultData;
+                simpanDataKeCloud(auth.currentUser.uid).then(() => {
+                    triggerCustomAlert('success', 'Berhasil Disimpan', 'Sandi diamankan langsung ke Cloud!');
+                    document.getElementById('genNamaAkun').value = '';
                     renderCards();
-                }
+                }).catch(e => triggerCustomAlert('error', 'Gagal', 'Sistem gagal menyimpan ke server.'));
                 return;
             }
 
-            const targetItem = currentLoadedVault.find(i => i.id === targetIdOrMp);
+            const targetItem = currentLoadedVault.find(i => i.id === targetId);
             if(!targetItem) return;
 
             let plainPass = "";
@@ -673,15 +734,17 @@
             } catch(e) { return triggerCustomAlert('error', 'Error Sistem', 'Data rusak.'); }
 
             if(actionType === 'view') {
-                revealedItems[targetIdOrMp] = true; renderCards();
+                revealedItems[targetId] = true; renderCards();
             } else if(actionType === 'copy') {
                 navigator.clipboard.writeText(plainPass).then(() => triggerCustomAlert('success', 'Disalin', 'Password berhasil disalin.'));
             } else if(actionType === 'delete') {
-                currentLoadedVault = currentLoadedVault.filter(i => i.id !== targetIdOrMp);
-                if(revealedItems[targetIdOrMp]) delete revealedItems[targetIdOrMp];
-                localStorage.setItem(getStorageKey(activeMasterPass), CryptoJS.AES.encrypt(JSON.stringify(currentLoadedVault), activeMasterPass).toString());
-                renderCards();
-                triggerCustomAlert('success', 'Dihapus', 'Password telah dihapus.');
+                currentLoadedVault = currentLoadedVault.filter(i => i.id !== targetId);
+                if(revealedItems[targetId]) delete revealedItems[targetId];
+                
+                simpanDataKeCloud(auth.currentUser.uid).then(() => {
+                    renderCards();
+                    triggerCustomAlert('success', 'Dihapus', 'Data telah dihapus dari Brankas Cloud.');
+                }).catch(e => triggerCustomAlert('error', 'Gagal', 'Gagal menghapus di server.'));
             }
         }
 
